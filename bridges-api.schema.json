@@ -1,0 +1,4114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Chart Values",
+  "type": "object",
+  "properties": {
+    "global": {
+      "type": "object",
+      "properties": {
+        "imageRegistry": {
+          "type": "string",
+          "default": "",
+          "description": "Override the default image registry for all images used in this chart."
+        },
+        "imagePullSecrets": {
+          "type": "array",
+          "items": {
+            "description": "Image pull secret reference.",
+            "markdownDescription": "Image pull secret as either a string secret name or a Kubernetes `{ name: ... }` object.",
+            "anyOf": [
+              {
+                "type": "string",
+                "description": "Secret name.",
+                "markdownDescription": "Secret name."
+              },
+              {
+                "type": "object",
+                "description": "Reference to a Kubernetes object by name.",
+                "additionalProperties": true,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the referenced object.",
+                    "markdownDescription": "Name of the referenced object."
+                  }
+                },
+                "markdownDescription": "Reference to a Kubernetes object by name."
+              }
+            ]
+          },
+          "default": [],
+          "description": "List of imagePullSecrets (Kubernetes secrets) to use for pulling images. Example:   imagePullSecrets:     - myRegistryKeySecretName"
+        }
+      },
+      "description": "Global values shared by this chart and dependencies.",
+      "markdownDescription": "Global image defaults used by the chart and dependency helpers.\nUse this for registry-wide overrides and shared image pull secrets."
+    },
+    "kubeVersion": {
+      "type": "string",
+      "default": "",
+      "description": "Override the Kubernetes version (leave blank for auto-detect)."
+    },
+    "fullnameOverride": {
+      "type": "string",
+      "default": "",
+      "description": "Override the full resource name (optional)."
+    },
+    "namespaceOverride": {
+      "type": "string",
+      "default": "",
+      "description": "Override the release namespace (optional)."
+    },
+    "commonLabels": {
+      "type": "object",
+      "description": "Extra labels to apply to all deployed resources.",
+      "markdownDescription": "Free-form map with string values. Good for labels, annotations, selectors, and string data.",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "default": {}
+    },
+    "commonAnnotations": {
+      "type": "object",
+      "description": "Extra annotations to apply to all deployed resources.",
+      "markdownDescription": "Free-form map with string values. Good for labels, annotations, selectors, and string data.",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "default": {}
+    },
+    "configmapChecksumAnnotations": {
+      "type": "boolean",
+      "default": true,
+      "description": "Enable rolling updates when ConfigMap(s) change."
+    },
+    "secretChecksumAnnotations": {
+      "type": "boolean",
+      "default": true,
+      "description": "Enable rolling updates when Secret changes."
+    },
+    "priorityClassName": {
+      "type": "string",
+      "default": "",
+      "description": "PriorityClass name for workload pods."
+    },
+    "extraDeploy": {
+      "type": "array",
+      "items": {},
+      "default": [],
+      "description": "Extra Kubernetes resources to deploy with the release.",
+      "markdownDescription": "Raw Kubernetes manifests rendered with `tpl` and deployed with the chart.\n\nExample:\n```yaml\nextraDeploy:\n  - apiVersion: v1\n    kind: ConfigMap\n    metadata:\n      name: extra-config\n    data:\n      key: value\n```"
+    },
+    "extraVolumes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "description": "Kubernetes volume.",
+        "markdownDescription": "Kubernetes pod volume. Common sources include `configMap`, `secret`, `emptyDir`, and `persistentVolumeClaim`.",
+        "additionalProperties": true,
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Volume name.",
+            "markdownDescription": "Volume name."
+          },
+          "configMap": {
+            "type": "object",
+            "description": "Reference to a Kubernetes object by name.",
+            "additionalProperties": true,
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Name of the referenced object.",
+                "markdownDescription": "Name of the referenced object."
+              }
+            },
+            "markdownDescription": "Reference to a Kubernetes object by name."
+          },
+          "secret": {
+            "type": "object",
+            "description": "Reference to a Kubernetes object by name.",
+            "additionalProperties": true,
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Name of the referenced object.",
+                "markdownDescription": "Name of the referenced object."
+              }
+            },
+            "markdownDescription": "Reference to a Kubernetes object by name."
+          },
+          "emptyDir": {
+            "type": "object",
+            "description": "Ephemeral emptyDir volume configuration.",
+            "additionalProperties": true,
+            "markdownDescription": "Ephemeral emptyDir volume configuration."
+          },
+          "persistentVolumeClaim": {
+            "type": "object",
+            "description": "PersistentVolumeClaim volume source.",
+            "additionalProperties": true,
+            "properties": {
+              "claimName": {
+                "type": "string",
+                "description": "PVC claim name.",
+                "markdownDescription": "PVC claim name."
+              },
+              "readOnly": {
+                "type": "boolean",
+                "description": "Mount as read-only.",
+                "markdownDescription": "Mount as read-only."
+              }
+            },
+            "markdownDescription": "PersistentVolumeClaim volume source."
+          }
+        }
+      },
+      "default": [],
+      "description": "Extra volumes for the pod."
+    },
+    "extraVolumeMounts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "description": "Kubernetes volume mount.",
+        "markdownDescription": "Container volume mount. Match `name` to a pod volume and set `mountPath` inside the container.",
+        "additionalProperties": true,
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the volume to mount.",
+            "markdownDescription": "Name of the volume to mount."
+          },
+          "mountPath": {
+            "type": "string",
+            "description": "Path inside the container.",
+            "markdownDescription": "Path inside the container."
+          },
+          "subPath": {
+            "type": "string",
+            "description": "Sub-path inside the referenced volume.",
+            "markdownDescription": "Sub-path inside the referenced volume."
+          },
+          "readOnly": {
+            "type": "boolean",
+            "description": "Mount as read-only.",
+            "markdownDescription": "Mount as read-only."
+          }
+        }
+      },
+      "default": [],
+      "description": "Extra volumeMounts for the main container."
+    },
+    "env": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "description": "Kubernetes environment variable.",
+        "markdownDescription": "Kubernetes `EnvVar` item. Use `value` for literal values or `valueFrom` for ConfigMap, Secret, field, or resource references.",
+        "additionalProperties": true,
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Environment variable name.",
+            "markdownDescription": "Environment variable name."
+          },
+          "value": {
+            "type": "string",
+            "description": "Environment variable value.",
+            "markdownDescription": "Environment variable value."
+          },
+          "valueFrom": {
+            "type": "object",
+            "description": "Source for the environment variable value.",
+            "markdownDescription": "Use one source for this env var: `secretKeyRef`, `configMapKeyRef`, `fieldRef`, or `resourceFieldRef`.",
+            "additionalProperties": true,
+            "properties": {
+              "secretKeyRef": {
+                "type": "object",
+                "description": "Reference to a key in a ConfigMap or Secret.",
+                "additionalProperties": true,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the referenced object.",
+                    "markdownDescription": "Name of the referenced object."
+                  },
+                  "key": {
+                    "type": "string",
+                    "description": "Key to select.",
+                    "markdownDescription": "Key to select."
+                  },
+                  "optional": {
+                    "type": "boolean",
+                    "description": "Whether the referenced object or key must exist.",
+                    "markdownDescription": "Whether the referenced object or key must exist."
+                  }
+                },
+                "markdownDescription": "Reference to a key in a ConfigMap or Secret."
+              },
+              "configMapKeyRef": {
+                "type": "object",
+                "description": "Reference to a key in a ConfigMap or Secret.",
+                "additionalProperties": true,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the referenced object.",
+                    "markdownDescription": "Name of the referenced object."
+                  },
+                  "key": {
+                    "type": "string",
+                    "description": "Key to select.",
+                    "markdownDescription": "Key to select."
+                  },
+                  "optional": {
+                    "type": "boolean",
+                    "description": "Whether the referenced object or key must exist.",
+                    "markdownDescription": "Whether the referenced object or key must exist."
+                  }
+                },
+                "markdownDescription": "Reference to a key in a ConfigMap or Secret."
+              },
+              "fieldRef": {
+                "type": "object",
+                "description": "Selects a field of the pod.",
+                "additionalProperties": true,
+                "properties": {
+                  "fieldPath": {
+                    "type": "string",
+                    "description": "Field path.",
+                    "markdownDescription": "Field path."
+                  },
+                  "apiVersion": {
+                    "type": "string",
+                    "description": "API version.",
+                    "markdownDescription": "API version."
+                  }
+                },
+                "markdownDescription": "Selects a field of the pod."
+              },
+              "resourceFieldRef": {
+                "type": "object",
+                "description": "Selects a container resource.",
+                "additionalProperties": true,
+                "properties": {
+                  "resource": {
+                    "type": "string",
+                    "description": "Resource name.",
+                    "markdownDescription": "Resource name."
+                  },
+                  "containerName": {
+                    "type": "string",
+                    "description": "Container name.",
+                    "markdownDescription": "Container name."
+                  },
+                  "divisor": {
+                    "type": [
+                      "string",
+                      "number"
+                    ],
+                    "description": "Kubernetes resource quantity.",
+                    "markdownDescription": "Kubernetes resource quantity."
+                  }
+                },
+                "markdownDescription": "Selects a container resource."
+              }
+            }
+          }
+        }
+      },
+      "default": [],
+      "description": "Extra environment variables for the main container."
+    },
+    "envFrom": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "description": "Kubernetes environment source.",
+        "markdownDescription": "Kubernetes `EnvFromSource`. Imports all keys from a ConfigMap or Secret as environment variables, optionally with `prefix`.",
+        "additionalProperties": true,
+        "properties": {
+          "prefix": {
+            "type": "string",
+            "description": "Prefix added to each environment variable name.",
+            "markdownDescription": "Prefix added to each environment variable name."
+          },
+          "configMapRef": {
+            "type": "object",
+            "description": "Reference to a Kubernetes object by name.",
+            "additionalProperties": true,
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Name of the referenced object.",
+                "markdownDescription": "Name of the referenced object."
+              }
+            },
+            "markdownDescription": "Reference to a Kubernetes object by name."
+          },
+          "secretRef": {
+            "type": "object",
+            "description": "Reference to a Kubernetes object by name.",
+            "additionalProperties": true,
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Name of the referenced object.",
+                "markdownDescription": "Name of the referenced object."
+              }
+            },
+            "markdownDescription": "Reference to a Kubernetes object by name."
+          }
+        }
+      },
+      "default": [],
+      "description": "Extra envFrom entries for the main container."
+    },
+    "secret": {
+      "type": "object",
+      "properties": {
+        "create": {
+          "type": "boolean",
+          "default": false,
+          "description": "Create a Kubernetes Secret."
+        },
+        "name": {
+          "type": "string",
+          "default": "",
+          "description": "Override Secret name. Defaults to <fullname>-secret."
+        },
+        "type": {
+          "type": "string",
+          "default": "Opaque",
+          "description": "Kubernetes Secret type."
+        },
+        "labels": {
+          "type": "object",
+          "description": "Extra labels for the Secret.",
+          "markdownDescription": "Free-form map with string values. Good for labels, annotations, selectors, and string data.",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {}
+        },
+        "annotations": {
+          "type": "object",
+          "description": "Extra annotations for the Secret.",
+          "markdownDescription": "Free-form map with string values. Good for labels, annotations, selectors, and string data.",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {}
+        },
+        "stringData": {
+          "type": "object",
+          "description": "Secret stringData passthrough.",
+          "markdownDescription": "Free-form map with string values. Good for labels, annotations, selectors, and string data.",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {}
+        },
+        "data": {
+          "type": "object",
+          "description": "Secret data passthrough.",
+          "markdownDescription": "Free-form map with string values. Good for labels, annotations, selectors, and string data.",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {}
+        }
+      },
+      "description": "Optional Kubernetes Secret rendered by this chart.",
+      "markdownDescription": "Create an app Secret from `stringData` or base64-encoded `data` and import it into workload pods."
+    },
+    "secretProviderClass": {
+      "type": "object",
+      "properties": {
+        "create": {
+          "type": "boolean",
+          "default": false,
+          "description": "Create a SecretProviderClass."
+        },
+        "name": {
+          "type": "string",
+          "default": "",
+          "description": "Override SecretProviderClass name. Defaults to <fullname>-secrets-store."
+        },
+        "labels": {
+          "type": "object",
+          "description": "Extra labels for the SecretProviderClass.",
+          "markdownDescription": "Free-form map with string values. Good for labels, annotations, selectors, and string data.",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {}
+        },
+        "annotations": {
+          "type": "object",
+          "description": "Extra annotations for the SecretProviderClass.",
+          "markdownDescription": "Free-form map with string values. Good for labels, annotations, selectors, and string data.",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {}
+        },
+        "spec": {
+          "type": "object",
+          "additionalProperties": true,
+          "default": {},
+          "description": "SecretProviderClass spec passthrough."
+        },
+        "mount": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": false,
+              "description": "Mount the SecretProviderClass as files using the Secrets Store CSI driver."
+            },
+            "path": {
+              "type": "string",
+              "default": "/mnt/secrets-store",
+              "description": "Mount path for SecretProviderClass files."
+            }
+          },
+          "description": "Secrets Store CSI volume mount options."
+        }
+      },
+      "description": "Secrets Store CSI SecretProviderClass settings.",
+      "markdownDescription": "Configure a provider-specific Secrets Store CSI `SecretProviderClass` and optional file mount.\n`spec` is passed through unchanged because provider schemas differ."
+    },
+    "tests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "description": "Helm test Job values.",
+        "markdownDescription": "Helm test Job values rendered with the `helm.sh/hook: test` annotation. Use for smoke tests and diagnostics that run with `helm test`.",
+        "additionalProperties": true,
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Render this test job.",
+            "markdownDescription": "Render this test job."
+          },
+          "name": {
+            "type": "string",
+            "description": "Test job name suffix.",
+            "markdownDescription": "Test job name suffix."
+          },
+          "annotations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "labels": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "podLabels": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "podAnnotations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "restartPolicy": {
+            "type": "string",
+            "description": "Pod restart policy.",
+            "enum": [
+              "Always",
+              "OnFailure",
+              "Never"
+            ],
+            "markdownDescription": "Pod restart policy."
+          },
+          "image": {
+            "type": "object",
+            "description": "Container image override for this job.",
+            "additionalProperties": true,
+            "properties": {
+              "registry": {
+                "type": "string",
+                "description": "Image registry.",
+                "markdownDescription": "Image registry."
+              },
+              "repository": {
+                "type": "string",
+                "description": "Image repository.",
+                "markdownDescription": "Image repository."
+              },
+              "tag": {
+                "type": "string",
+                "description": "Image tag.",
+                "markdownDescription": "Image tag."
+              },
+              "digest": {
+                "type": "string",
+                "description": "Image digest; overrides tag.",
+                "markdownDescription": "Image digest; overrides tag."
+              }
+            },
+            "markdownDescription": "Container image override for this job."
+          },
+          "imagePullPolicy": {
+            "type": "string",
+            "description": "Container image pull policy.",
+            "enum": [
+              "Always",
+              "IfNotPresent",
+              "Never"
+            ],
+            "markdownDescription": "Container image pull policy."
+          },
+          "command": {
+            "type": "array",
+            "description": "Command and arguments.",
+            "items": {
+              "type": "string"
+            },
+            "markdownDescription": "Command and arguments."
+          },
+          "args": {
+            "type": "array",
+            "description": "Command and arguments.",
+            "items": {
+              "type": "string"
+            },
+            "markdownDescription": "Command and arguments."
+          },
+          "env": {
+            "type": "array",
+            "description": "Environment variables.",
+            "items": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Environment variable name.",
+                  "markdownDescription": "Environment variable name."
+                },
+                "value": {
+                  "type": "string",
+                  "description": "Environment variable value.",
+                  "markdownDescription": "Environment variable value."
+                },
+                "valueFrom": {
+                  "type": "object",
+                  "description": "Source for the environment variable value.",
+                  "additionalProperties": true,
+                  "markdownDescription": "Source for the environment variable value."
+                }
+              }
+            },
+            "markdownDescription": "Environment variables."
+          },
+          "envFrom": {
+            "type": "array",
+            "description": "Environment sources.",
+            "items": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "prefix": {
+                  "type": "string",
+                  "description": "Variable name prefix.",
+                  "markdownDescription": "Variable name prefix."
+                },
+                "configMapRef": {
+                  "type": "object",
+                  "description": "Reference to a Kubernetes object by name.",
+                  "additionalProperties": true,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the referenced object.",
+                      "markdownDescription": "Name of the referenced object."
+                    }
+                  },
+                  "markdownDescription": "Reference to a Kubernetes object by name."
+                },
+                "secretRef": {
+                  "type": "object",
+                  "description": "Reference to a Kubernetes object by name.",
+                  "additionalProperties": true,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the referenced object.",
+                      "markdownDescription": "Name of the referenced object."
+                    }
+                  },
+                  "markdownDescription": "Reference to a Kubernetes object by name."
+                }
+              }
+            },
+            "markdownDescription": "Environment sources."
+          },
+          "volumeMounts": {
+            "type": "array",
+            "description": "Container volume mounts.",
+            "items": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Volume name.",
+                  "markdownDescription": "Volume name."
+                },
+                "mountPath": {
+                  "type": "string",
+                  "description": "Mount path.",
+                  "markdownDescription": "Mount path."
+                },
+                "subPath": {
+                  "type": "string",
+                  "description": "Optional sub-path.",
+                  "markdownDescription": "Optional sub-path."
+                },
+                "readOnly": {
+                  "type": "boolean",
+                  "description": "Mount read-only.",
+                  "markdownDescription": "Mount read-only."
+                }
+              }
+            },
+            "markdownDescription": "Container volume mounts."
+          },
+          "resources": {
+            "type": "object",
+            "description": "Kubernetes container resource requirements.",
+            "markdownDescription": "Container resource requests and limits. Set `requests` for scheduling guarantees and `limits` only when you need hard caps.",
+            "additionalProperties": true,
+            "properties": {
+              "requests": {
+                "type": "object",
+                "description": "Minimum requested resources.",
+                "markdownDescription": "Minimum resources reserved by the scheduler. Common keys: `cpu`, `memory`, and `ephemeral-storage`.",
+                "additionalProperties": {
+                  "type": [
+                    "string",
+                    "number"
+                  ],
+                  "description": "Kubernetes resource quantity.",
+                  "markdownDescription": "Kubernetes resource quantity."
+                },
+                "properties": {
+                  "cpu": {
+                    "type": [
+                      "string",
+                      "number"
+                    ],
+                    "description": "Kubernetes resource quantity.",
+                    "markdownDescription": "Kubernetes resource quantity."
+                  },
+                  "memory": {
+                    "type": [
+                      "string",
+                      "number"
+                    ],
+                    "description": "Kubernetes resource quantity.",
+                    "markdownDescription": "Kubernetes resource quantity."
+                  },
+                  "ephemeral-storage": {
+                    "type": [
+                      "string",
+                      "number"
+                    ],
+                    "description": "Kubernetes resource quantity.",
+                    "markdownDescription": "Kubernetes resource quantity."
+                  }
+                }
+              },
+              "limits": {
+                "type": "object",
+                "description": "Maximum allowed resources.",
+                "additionalProperties": {
+                  "type": [
+                    "string",
+                    "number"
+                  ],
+                  "description": "Kubernetes resource quantity.",
+                  "markdownDescription": "Kubernetes resource quantity."
+                },
+                "properties": {
+                  "cpu": {
+                    "type": [
+                      "string",
+                      "number"
+                    ],
+                    "description": "Kubernetes resource quantity.",
+                    "markdownDescription": "Kubernetes resource quantity."
+                  },
+                  "memory": {
+                    "type": [
+                      "string",
+                      "number"
+                    ],
+                    "description": "Kubernetes resource quantity.",
+                    "markdownDescription": "Kubernetes resource quantity."
+                  },
+                  "ephemeral-storage": {
+                    "type": [
+                      "string",
+                      "number"
+                    ],
+                    "description": "Kubernetes resource quantity.",
+                    "markdownDescription": "Kubernetes resource quantity."
+                  }
+                },
+                "markdownDescription": "Maximum allowed resources."
+              }
+            }
+          },
+          "volumes": {
+            "type": "array",
+            "description": "Pod volumes.",
+            "items": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Volume name.",
+                  "markdownDescription": "Volume name."
+                },
+                "configMap": {
+                  "type": "object",
+                  "description": "Reference to a Kubernetes object by name.",
+                  "additionalProperties": true,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the referenced object.",
+                      "markdownDescription": "Name of the referenced object."
+                    }
+                  },
+                  "markdownDescription": "Reference to a Kubernetes object by name."
+                },
+                "secret": {
+                  "type": "object",
+                  "description": "Reference to a Kubernetes object by name.",
+                  "additionalProperties": true,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the referenced object.",
+                      "markdownDescription": "Name of the referenced object."
+                    }
+                  },
+                  "markdownDescription": "Reference to a Kubernetes object by name."
+                },
+                "emptyDir": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "persistentVolumeClaim": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "properties": {
+                    "claimName": {
+                      "type": "string",
+                      "description": "PVC claim name.",
+                      "markdownDescription": "PVC claim name."
+                    }
+                  }
+                }
+              }
+            },
+            "markdownDescription": "Pod volumes."
+          },
+          "backoffLimit": {
+            "type": "integer",
+            "description": "Retries before marking the test job failed.",
+            "minimum": 0,
+            "markdownDescription": "Retries before marking the test job failed."
+          }
+        }
+      },
+      "default": [],
+      "description": "List of Helm test Jobs.",
+      "markdownDescription": "Helm test Jobs rendered with the `helm.sh/hook: test` annotation.\nUse these for smoke tests, schema assertions, and app-owned diagnostics.\n\nExample:\n```yaml\ntests:\n  - name: smoke\n    image:\n      repository: curlimages/curl\n      tag: 8.8.0\n    command: [\"curl\"]\n    args: [\"--fail\", \"http://bridges-api:80/hc/ready\"]\n    backoffLimit: 0\n```"
+    },
+    "cronjobs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "description": "Helm CronJob values.",
+        "markdownDescription": "Helm CronJob values for scheduled work. Set `schedule`, image/command, and optional env, volumes, resources, and scheduling rules.",
+        "additionalProperties": true,
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Render this CronJob.",
+            "markdownDescription": "Render this CronJob."
+          },
+          "name": {
+            "type": "string",
+            "description": "CronJob name suffix.",
+            "markdownDescription": "CronJob name suffix."
+          },
+          "schedule": {
+            "type": "string",
+            "description": "Cron schedule expression.",
+            "markdownDescription": "Cron schedule expression."
+          },
+          "timeZone": {
+            "type": "string",
+            "description": "CronJob time zone.",
+            "markdownDescription": "CronJob time zone."
+          },
+          "concurrencyPolicy": {
+            "type": "string",
+            "description": "How concurrent executions are handled.",
+            "enum": [
+              "Allow",
+              "Forbid",
+              "Replace"
+            ],
+            "markdownDescription": "How concurrent executions are handled."
+          },
+          "startingDeadlineSeconds": {
+            "type": "integer",
+            "description": "Deadline for starting a missed job.",
+            "minimum": 0,
+            "markdownDescription": "Deadline for starting a missed job."
+          },
+          "suspend": {
+            "type": "boolean",
+            "description": "Suspend future runs.",
+            "markdownDescription": "Suspend future runs."
+          },
+          "successfulJobsHistoryLimit": {
+            "type": "integer",
+            "description": "Successful job history to retain.",
+            "minimum": 0,
+            "markdownDescription": "Successful job history to retain."
+          },
+          "failedJobsHistoryLimit": {
+            "type": "integer",
+            "description": "Failed job history to retain.",
+            "minimum": 0,
+            "markdownDescription": "Failed job history to retain."
+          },
+          "ttlSecondsAfterFinished": {
+            "type": "integer",
+            "description": "TTL for finished Jobs.",
+            "minimum": 0,
+            "markdownDescription": "TTL for finished Jobs."
+          },
+          "activeDeadlineSeconds": {
+            "type": "integer",
+            "description": "Maximum runtime for a Job.",
+            "minimum": 0,
+            "markdownDescription": "Maximum runtime for a Job."
+          },
+          "backoffLimit": {
+            "type": "integer",
+            "description": "Retries before marking a Job failed.",
+            "minimum": 0,
+            "markdownDescription": "Retries before marking a Job failed."
+          },
+          "restartPolicy": {
+            "type": "string",
+            "description": "Pod restart policy.",
+            "enum": [
+              "Always",
+              "OnFailure",
+              "Never"
+            ],
+            "markdownDescription": "Pod restart policy."
+          },
+          "image": {
+            "type": "object",
+            "description": "Container image override for this job.",
+            "additionalProperties": true,
+            "properties": {
+              "registry": {
+                "type": "string",
+                "description": "Image registry.",
+                "markdownDescription": "Image registry."
+              },
+              "repository": {
+                "type": "string",
+                "description": "Image repository.",
+                "markdownDescription": "Image repository."
+              },
+              "tag": {
+                "type": "string",
+                "description": "Image tag.",
+                "markdownDescription": "Image tag."
+              },
+              "digest": {
+                "type": "string",
+                "description": "Image digest; overrides tag.",
+                "markdownDescription": "Image digest; overrides tag."
+              }
+            },
+            "markdownDescription": "Container image override for this job."
+          },
+          "imagePullPolicy": {
+            "type": "string",
+            "description": "Container image pull policy.",
+            "enum": [
+              "Always",
+              "IfNotPresent",
+              "Never"
+            ],
+            "markdownDescription": "Container image pull policy."
+          },
+          "command": {
+            "type": "array",
+            "description": "Command and arguments.",
+            "items": {
+              "type": "string"
+            },
+            "markdownDescription": "Command and arguments."
+          },
+          "args": {
+            "type": "array",
+            "description": "Command and arguments.",
+            "items": {
+              "type": "string"
+            },
+            "markdownDescription": "Command and arguments."
+          },
+          "inheritEnvFrom": {
+            "type": "boolean",
+            "description": "Inherit chart ConfigMap and Secret envFrom sources.",
+            "markdownDescription": "Inherit chart ConfigMap and Secret envFrom sources."
+          },
+          "inheritExtraVolumes": {
+            "type": "boolean",
+            "description": "Inherit chart extra volumes and mounts.",
+            "markdownDescription": "Inherit chart extra volumes and mounts."
+          },
+          "env": {
+            "type": "array",
+            "description": "Environment variables.",
+            "items": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Environment variable name.",
+                  "markdownDescription": "Environment variable name."
+                },
+                "value": {
+                  "type": "string",
+                  "description": "Environment variable value.",
+                  "markdownDescription": "Environment variable value."
+                },
+                "valueFrom": {
+                  "type": "object",
+                  "description": "Source for the environment variable value.",
+                  "additionalProperties": true,
+                  "markdownDescription": "Source for the environment variable value."
+                }
+              }
+            },
+            "markdownDescription": "Environment variables."
+          },
+          "envFrom": {
+            "type": "array",
+            "description": "Environment sources.",
+            "items": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "prefix": {
+                  "type": "string",
+                  "description": "Variable name prefix.",
+                  "markdownDescription": "Variable name prefix."
+                },
+                "configMapRef": {
+                  "type": "object",
+                  "description": "Reference to a Kubernetes object by name.",
+                  "additionalProperties": true,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the referenced object.",
+                      "markdownDescription": "Name of the referenced object."
+                    }
+                  },
+                  "markdownDescription": "Reference to a Kubernetes object by name."
+                },
+                "secretRef": {
+                  "type": "object",
+                  "description": "Reference to a Kubernetes object by name.",
+                  "additionalProperties": true,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the referenced object.",
+                      "markdownDescription": "Name of the referenced object."
+                    }
+                  },
+                  "markdownDescription": "Reference to a Kubernetes object by name."
+                }
+              }
+            },
+            "markdownDescription": "Environment sources."
+          },
+          "volumes": {
+            "type": "array",
+            "description": "Pod volumes.",
+            "items": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Volume name.",
+                  "markdownDescription": "Volume name."
+                },
+                "configMap": {
+                  "type": "object",
+                  "description": "Reference to a Kubernetes object by name.",
+                  "additionalProperties": true,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the referenced object.",
+                      "markdownDescription": "Name of the referenced object."
+                    }
+                  },
+                  "markdownDescription": "Reference to a Kubernetes object by name."
+                },
+                "secret": {
+                  "type": "object",
+                  "description": "Reference to a Kubernetes object by name.",
+                  "additionalProperties": true,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the referenced object.",
+                      "markdownDescription": "Name of the referenced object."
+                    }
+                  },
+                  "markdownDescription": "Reference to a Kubernetes object by name."
+                },
+                "emptyDir": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "persistentVolumeClaim": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "properties": {
+                    "claimName": {
+                      "type": "string",
+                      "description": "PVC claim name.",
+                      "markdownDescription": "PVC claim name."
+                    }
+                  }
+                }
+              }
+            },
+            "markdownDescription": "Pod volumes."
+          },
+          "volumeMounts": {
+            "type": "array",
+            "description": "Container volume mounts.",
+            "items": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Volume name.",
+                  "markdownDescription": "Volume name."
+                },
+                "mountPath": {
+                  "type": "string",
+                  "description": "Mount path.",
+                  "markdownDescription": "Mount path."
+                },
+                "subPath": {
+                  "type": "string",
+                  "description": "Optional sub-path.",
+                  "markdownDescription": "Optional sub-path."
+                },
+                "readOnly": {
+                  "type": "boolean",
+                  "description": "Mount read-only.",
+                  "markdownDescription": "Mount read-only."
+                }
+              }
+            },
+            "markdownDescription": "Container volume mounts."
+          },
+          "resources": {
+            "type": "object",
+            "description": "Kubernetes container resource requirements.",
+            "markdownDescription": "Container resource requests and limits. Set `requests` for scheduling guarantees and `limits` only when you need hard caps.",
+            "additionalProperties": true,
+            "properties": {
+              "requests": {
+                "type": "object",
+                "description": "Minimum requested resources.",
+                "markdownDescription": "Minimum resources reserved by the scheduler. Common keys: `cpu`, `memory`, and `ephemeral-storage`.",
+                "additionalProperties": {
+                  "type": [
+                    "string",
+                    "number"
+                  ],
+                  "description": "Kubernetes resource quantity.",
+                  "markdownDescription": "Kubernetes resource quantity."
+                },
+                "properties": {
+                  "cpu": {
+                    "type": [
+                      "string",
+                      "number"
+                    ],
+                    "description": "Kubernetes resource quantity.",
+                    "markdownDescription": "Kubernetes resource quantity."
+                  },
+                  "memory": {
+                    "type": [
+                      "string",
+                      "number"
+                    ],
+                    "description": "Kubernetes resource quantity.",
+                    "markdownDescription": "Kubernetes resource quantity."
+                  },
+                  "ephemeral-storage": {
+                    "type": [
+                      "string",
+                      "number"
+                    ],
+                    "description": "Kubernetes resource quantity.",
+                    "markdownDescription": "Kubernetes resource quantity."
+                  }
+                }
+              },
+              "limits": {
+                "type": "object",
+                "description": "Maximum allowed resources.",
+                "additionalProperties": {
+                  "type": [
+                    "string",
+                    "number"
+                  ],
+                  "description": "Kubernetes resource quantity.",
+                  "markdownDescription": "Kubernetes resource quantity."
+                },
+                "properties": {
+                  "cpu": {
+                    "type": [
+                      "string",
+                      "number"
+                    ],
+                    "description": "Kubernetes resource quantity.",
+                    "markdownDescription": "Kubernetes resource quantity."
+                  },
+                  "memory": {
+                    "type": [
+                      "string",
+                      "number"
+                    ],
+                    "description": "Kubernetes resource quantity.",
+                    "markdownDescription": "Kubernetes resource quantity."
+                  },
+                  "ephemeral-storage": {
+                    "type": [
+                      "string",
+                      "number"
+                    ],
+                    "description": "Kubernetes resource quantity.",
+                    "markdownDescription": "Kubernetes resource quantity."
+                  }
+                },
+                "markdownDescription": "Maximum allowed resources."
+              }
+            }
+          },
+          "nodeSelector": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "tolerations": {
+            "type": "array",
+            "description": "Pod tolerations.",
+            "items": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "description": "Taint key to tolerate.",
+                  "markdownDescription": "Taint key to tolerate."
+                },
+                "operator": {
+                  "type": "string",
+                  "description": "Toleration operator.",
+                  "enum": [
+                    "Exists",
+                    "Equal"
+                  ],
+                  "markdownDescription": "Toleration operator."
+                },
+                "value": {
+                  "type": "string",
+                  "description": "Taint value to match.",
+                  "markdownDescription": "Taint value to match."
+                },
+                "effect": {
+                  "type": "string",
+                  "description": "Taint effect to tolerate.",
+                  "enum": [
+                    "NoSchedule",
+                    "PreferNoSchedule",
+                    "NoExecute"
+                  ],
+                  "markdownDescription": "Taint effect to tolerate."
+                },
+                "tolerationSeconds": {
+                  "type": "integer",
+                  "description": "Seconds to tolerate NoExecute taint.",
+                  "minimum": 0,
+                  "markdownDescription": "Seconds to tolerate NoExecute taint."
+                }
+              }
+            },
+            "markdownDescription": "Pod tolerations."
+          },
+          "affinity": {
+            "type": "object",
+            "description": "Pod affinity rules.",
+            "additionalProperties": true,
+            "markdownDescription": "Pod affinity rules."
+          },
+          "labels": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "annotations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "podLabels": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "podAnnotations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "default": [],
+      "description": "List of CronJob definitions.",
+      "markdownDescription": "Scheduled jobs that ship with this workload. CronJobs share main ConfigMap and Secret env sources by default.\nSet `inheritEnvFrom: false` to opt out.\n\nExample:\n```yaml\ncronjobs:\n  - name: cleanup\n    schedule: \"0 2 * * *\"\n    image:\n      repository: busybox\n      tag: 1.36.1\n    command: [\"/bin/sh\", \"-c\"]\n    args: [\"echo cleanup\"]\n    inheritEnvFrom: true\n    resources:\n      requests:\n        cpu: 25m\n        memory: 64Mi\n```"
+    },
+    "image": {
+      "type": "object",
+      "properties": {
+        "registry": {
+          "type": "string",
+          "default": "accgbridgesdeuwwl1aks001cr.azurecr.io",
+          "description": "Container image registry to pull the application image from."
+        },
+        "repository": {
+          "type": "string",
+          "default": "REPLACE_ME_REPOSITORY",
+          "description": "Image repository name for the application."
+        },
+        "tag": {
+          "type": "string",
+          "default": "REPLACE_ME_TAG",
+          "description": "Image tag to use for the application (immutable tags recommended for production)."
+        },
+        "digest": {
+          "type": "string",
+          "default": "",
+          "description": "Image digest to use (overrides tag if set)."
+        },
+        "pullPolicy": {
+          "type": "string",
+          "default": "IfNotPresent",
+          "description": "Image pull policy for the application container.",
+          "enum": [
+            "Always",
+            "IfNotPresent",
+            "Never"
+          ]
+        },
+        "pullSecrets": {
+          "type": "array",
+          "items": {
+            "description": "Image pull secret reference.",
+            "markdownDescription": "Image pull secret as either a string secret name or a Kubernetes `{ name: ... }` object.",
+            "anyOf": [
+              {
+                "type": "string",
+                "description": "Secret name.",
+                "markdownDescription": "Secret name."
+              },
+              {
+                "type": "object",
+                "description": "Reference to a Kubernetes object by name.",
+                "additionalProperties": true,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the referenced object.",
+                    "markdownDescription": "Name of the referenced object."
+                  }
+                },
+                "markdownDescription": "Reference to a Kubernetes object by name."
+              }
+            ]
+          },
+          "default": [],
+          "description": "List of Kubernetes secrets for pulling images from private registries (must exist in the namespace)."
+        }
+      },
+      "description": "Container image used by the main application Deployment, CronJobs, and tests unless overridden.",
+      "markdownDescription": "Configure image registry, repository, tag/digest, pull policy, and pull secrets.\nUse immutable tags or `digest` for production releases."
+    },
+    "ingress": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to create an Ingress resource for this service."
+        },
+        "className": {
+          "type": "string",
+          "default": "",
+          "description": "IngressClass to target (e.g. \"nginx\", \"azure-application-gateway\"). Leave empty to use the cluster default class."
+        },
+        "hostname": {
+          "type": "string",
+          "default": "",
+          "description": "Primary host name to route to this service (e.g. \"api.example.com\"). If empty, the rule will typically be host-less (catch-all) unless `extraHosts` are specified."
+        },
+        "path": {
+          "type": "string",
+          "default": "/",
+          "description": "HTTP path to expose for the primary host. Usually \"/\" for path-based routing; combine with `pathType`."
+        },
+        "pathType": {
+          "type": "string",
+          "default": "Prefix",
+          "description": "Kubernetes path matching strategy for `path`. One of: Prefix, Exact, ImplementationSpecific.",
+          "enum": [
+            "Prefix",
+            "Exact",
+            "ImplementationSpecific"
+          ]
+        },
+        "annotations": {
+          "type": "object",
+          "description": "Additional annotations to place on the Ingress.",
+          "markdownDescription": "Free-form map with string values. Good for labels, annotations, selectors, and string data.",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {}
+        },
+        "tls": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable TLS for the primary host rule. Use `extraTls` to reference existing TLS secrets, or controller-specific annotations for managed certificates."
+        },
+        "extraHosts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "description": "Additional Helm Ingress host rule.",
+            "markdownDescription": "Helm-style additional host rule for an Ingress. Use this when one chart release should route more than the primary host.",
+            "additionalProperties": true,
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Ingress host name.",
+                "markdownDescription": "Ingress host name."
+              },
+              "path": {
+                "type": "string",
+                "description": "HTTP path for this host.",
+                "default": "/",
+                "markdownDescription": "HTTP path for this host."
+              },
+              "pathType": {
+                "type": "string",
+                "description": "Kubernetes Ingress path matching strategy.",
+                "enum": [
+                  "Prefix",
+                  "Exact",
+                  "ImplementationSpecific"
+                ],
+                "markdownDescription": "Kubernetes Ingress path matching strategy."
+              }
+            }
+          },
+          "default": [],
+          "description": "Additional host rules to route to this service. Typical item shape (varies by chart helpers):   - name: extra.example.com     path: /     pathType: Prefix"
+        },
+        "extraPaths": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "description": "Additional Helm Ingress path rule.",
+            "markdownDescription": "Helm-style additional Ingress path. Use for extra routes or custom backends under the primary host.",
+            "additionalProperties": true,
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "HTTP path.",
+                "markdownDescription": "HTTP path."
+              },
+              "pathType": {
+                "type": "string",
+                "description": "Kubernetes Ingress path matching strategy.",
+                "enum": [
+                  "Prefix",
+                  "Exact",
+                  "ImplementationSpecific"
+                ],
+                "markdownDescription": "Kubernetes Ingress path matching strategy."
+              },
+              "backend": {
+                "type": "object",
+                "description": "Kubernetes Ingress backend.",
+                "additionalProperties": true,
+                "properties": {
+                  "service": {
+                    "type": "object",
+                    "description": "Service backend.",
+                    "additionalProperties": true,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Service name.",
+                        "markdownDescription": "Service name."
+                      },
+                      "port": {
+                        "type": "object",
+                        "description": "Service port.",
+                        "additionalProperties": true,
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "Service port name.",
+                            "markdownDescription": "Service port name."
+                          },
+                          "number": {
+                            "type": "integer",
+                            "description": "Service port number.",
+                            "minimum": 1,
+                            "maximum": 65535,
+                            "markdownDescription": "Service port number."
+                          }
+                        },
+                        "markdownDescription": "Service port."
+                      }
+                    },
+                    "markdownDescription": "Service backend."
+                  },
+                  "resource": {
+                    "type": "object",
+                    "description": "Resource backend.",
+                    "additionalProperties": true,
+                    "markdownDescription": "Resource backend."
+                  }
+                },
+                "markdownDescription": "Kubernetes Ingress backend."
+              }
+            }
+          },
+          "default": [],
+          "description": "Extra path rules to add under the primary host. Useful to expose additional paths or custom backends (shape depends on chart helpers). Example:   - path: /healthz     pathType: Exact     backend:       service:         name: my-svc         port:           number: 8080"
+        },
+        "extraTls": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "description": "Kubernetes Ingress TLS mapping.",
+            "markdownDescription": "Ingress TLS mapping from hostnames to an existing Kubernetes TLS Secret name.",
+            "additionalProperties": true,
+            "properties": {
+              "hosts": {
+                "type": "array",
+                "description": "Hosts covered by the TLS secret.",
+                "items": {
+                  "type": "string"
+                },
+                "markdownDescription": "Hosts covered by the TLS secret."
+              },
+              "secretName": {
+                "type": "string",
+                "description": "TLS Secret name.",
+                "markdownDescription": "TLS Secret name."
+              }
+            }
+          },
+          "default": [],
+          "description": "Additional TLS mappings. Standard shape:   - hosts:       - api.example.com     secretName: my-tls Use with controllers that expect Kubernetes TLS secrets (e.g., nginx)."
+        }
+      },
+      "description": "HTTP(S) ingress routing for the application Service.",
+      "markdownDescription": "Configure external HTTP(S) access. Use `extraHosts`, `extraPaths`, and `extraTls` for additional routes or TLS mappings."
+    },
+    "containerPort": {
+      "type": "integer",
+      "default": 8080,
+      "description": "Port exposed by the main application container.",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "service": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "ClusterIP",
+          "description": "Kubernetes Service type to create. Allowed values: ClusterIP, NodePort, LoadBalancer.",
+          "enum": [
+            "ClusterIP",
+            "NodePort",
+            "LoadBalancer"
+          ]
+        },
+        "port": {
+          "type": "integer",
+          "default": 80,
+          "description": "Port number exposed by the Service to external users (default: 80).",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "nodePort": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "default": "",
+          "description": "NodePort value to use when Service type is NodePort or LoadBalancer. Valid values: 30000-32767. Leave empty for auto-assignment. Ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport",
+          "minimum": 30000,
+          "maximum": 32767
+        },
+        "clusterIP": {
+          "type": "string",
+          "default": "",
+          "description": "Static clusterIP to assign to the Service. Leave empty for dynamic assignment."
+        },
+        "labels": {
+          "type": "object",
+          "description": "Extra labels to add to the Service resource.",
+          "markdownDescription": "Free-form map with string values. Good for labels, annotations, selectors, and string data.",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {}
+        },
+        "annotations": {
+          "type": "object",
+          "description": "Extra annotations to add to the Service resource.",
+          "markdownDescription": "Free-form map with string values. Good for labels, annotations, selectors, and string data.",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {}
+        },
+        "externalTrafficPolicy": {
+          "type": "string",
+          "default": "Cluster",
+          "description": "Sets Service externalTrafficPolicy to preserve client source IPs (\"Local\") or not (\"Cluster\"). Ref: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip",
+          "enum": [
+            "Cluster",
+            "Local"
+          ]
+        },
+        "loadBalancerSourceRanges": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "CIDR source range allowed to access a LoadBalancer Service.",
+            "examples": [
+              "10.0.0.0/8",
+              "203.0.113.10/32"
+            ],
+            "markdownDescription": "CIDR source range allowed to access a LoadBalancer Service."
+          },
+          "default": [],
+          "description": "List of IP ranges allowed access when Service type is LoadBalancer. Ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service"
+        },
+        "loadBalancerClass": {
+          "type": "string",
+          "default": "",
+          "description": "Specify a load balancer class when Service type is LoadBalancer (Kubernetes 1.23+). Ref: https://kubernetes.io/docs/concepts/services-networking/service/#load-balancer-class"
+        },
+        "loadBalancerIP": {
+          "type": "string",
+          "default": "",
+          "description": "Assign a specific IP to the LoadBalancer Service, if supported by your cloud provider. Ref: https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer"
+        },
+        "sessionAffinity": {
+          "type": "string",
+          "default": "None",
+          "description": "Controls session affinity. Valid values: \"None\" (default), \"ClientIP\". \"ClientIP\" will direct repeat requests from the same client to the same Pod. Ref: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies",
+          "enum": [
+            "None",
+            "ClientIP"
+          ]
+        },
+        "sessionAffinityConfig": {
+          "type": "object",
+          "additionalProperties": true,
+          "default": {},
+          "description": "Additional session affinity config (only if sessionAffinity is \"ClientIP\"). Example:   sessionAffinityConfig:     clientIP:       timeoutSeconds: 300"
+        }
+      },
+      "description": "Kubernetes Service exposing the application pods.",
+      "markdownDescription": "Configure Service type, ports, load-balancer options, labels, and annotations.\n`nodePort` may be empty for cluster auto-assignment."
+    },
+    "deployment": {
+      "type": "object",
+      "properties": {
+        "replicas": {
+          "type": "integer",
+          "default": 2,
+          "description": "Number of pod replicas to run.",
+          "minimum": 0
+        },
+        "updateStrategy": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "default": "RollingUpdate",
+              "description": "Update strategy type (\"RollingUpdate\" or \"Recreate\").",
+              "enum": [
+                "RollingUpdate",
+                "Recreate"
+              ]
+            },
+            "rollingUpdate": {
+              "type": "object",
+              "properties": {
+                "maxUnavailable": {
+                  "type": [
+                    "integer",
+                    "string"
+                  ],
+                  "default": 0,
+                  "description": "Maximum number of pods that can be unavailable during the update.",
+                  "minimum": 0
+                },
+                "maxSurge": {
+                  "type": [
+                    "integer",
+                    "string"
+                  ],
+                  "default": 1,
+                  "description": "Maximum number of extra pods created during the update.",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        },
+        "revisionHistoryLimit": {
+          "type": "integer",
+          "default": 5,
+          "description": "The number of old history to retain to allow rollback NOTE: Explicitly setting this field to 0, will result in cleaning up all the history, breaking ability to rollback",
+          "minimum": 0
+        }
+      },
+      "description": "Main application Deployment rollout settings.",
+      "markdownDescription": "Configure replica count, update strategy, and revision history for the application Deployment.\nPod-level scheduling, security, probes, and resources are configured by sibling values."
+    },
+    "podLabels": {
+      "type": "object",
+      "description": "Extra labels for pods (for example: Azure workload identity) ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/",
+      "markdownDescription": "Free-form map with string values. Good for labels, annotations, selectors, and string data.",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "default": {}
+    },
+    "podAnnotations": {
+      "type": "object",
+      "description": "Annotations for pods Ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/",
+      "markdownDescription": "Free-form map with string values. Good for labels, annotations, selectors, and string data.",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "default": {}
+    },
+    "automountServiceAccountToken": {
+      "type": "boolean",
+      "default": false,
+      "description": "Mount the pod service account token. Enable only when the workload needs Kubernetes API access or an identity integration requires it."
+    },
+    "podSecurityContext": {
+      "type": "object",
+      "description": "Pod-level securityContext.",
+      "markdownDescription": "Pod-level security context applied to all containers by default. Use for UID/GID, fsGroup, non-root, and seccomp defaults.",
+      "additionalProperties": true,
+      "properties": {
+        "fsGroup": {
+          "type": "integer",
+          "description": "Supplemental group ID for volumes.",
+          "markdownDescription": "Supplemental group ID for volumes."
+        },
+        "fsGroupChangePolicy": {
+          "type": "string",
+          "description": "Policy for changing volume ownership and permissions.",
+          "enum": [
+            "Always",
+            "OnRootMismatch"
+          ],
+          "markdownDescription": "Policy for changing volume ownership and permissions."
+        },
+        "runAsUser": {
+          "type": "integer",
+          "description": "User ID to run containers as.",
+          "markdownDescription": "User ID to run containers as."
+        },
+        "runAsGroup": {
+          "type": "integer",
+          "description": "Group ID to run containers as.",
+          "markdownDescription": "Group ID to run containers as."
+        },
+        "runAsNonRoot": {
+          "type": "boolean",
+          "description": "Require containers to run as non-root.",
+          "markdownDescription": "Require containers to run as non-root."
+        },
+        "supplementalGroups": {
+          "type": "array",
+          "description": "Additional group IDs.",
+          "items": {
+            "type": "integer"
+          },
+          "markdownDescription": "Additional group IDs."
+        },
+        "seccompProfile": {
+          "type": "object",
+          "description": "Linux seccomp profile settings.",
+          "additionalProperties": true,
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "Seccomp profile type for the pod.",
+              "enum": [
+                "RuntimeDefault",
+                "Localhost",
+                "Unconfined"
+              ],
+              "markdownDescription": "Seccomp profile type.",
+              "default": "RuntimeDefault"
+            },
+            "localhostProfile": {
+              "type": "string",
+              "description": "Localhost profile path when type is Localhost.",
+              "markdownDescription": "Localhost profile path when type is Localhost."
+            }
+          },
+          "markdownDescription": "Linux seccomp profile settings."
+        }
+      }
+    },
+    "containerSecurityContext": {
+      "type": "object",
+      "description": "Container-level securityContext for the main application container.",
+      "markdownDescription": "Container-level security context. Use for privilege escalation, capabilities, read-only root filesystem, runAs user/group, and seccomp.",
+      "additionalProperties": true,
+      "properties": {
+        "allowPrivilegeEscalation": {
+          "type": "boolean",
+          "description": "Allow privilege escalation in the application container.",
+          "markdownDescription": "Allow process privilege escalation.",
+          "default": false
+        },
+        "capabilities": {
+          "type": "object",
+          "description": "Linux capabilities to add or drop.",
+          "additionalProperties": true,
+          "properties": {
+            "add": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "drop": {
+              "type": "array",
+              "items": {},
+              "default": [
+                "ALL"
+              ],
+              "description": "Linux capabilities to drop from the application container."
+            }
+          },
+          "markdownDescription": "Linux capabilities to add or drop."
+        },
+        "privileged": {
+          "type": "boolean",
+          "description": "Run container as privileged.",
+          "markdownDescription": "Run container as privileged."
+        },
+        "readOnlyRootFilesystem": {
+          "type": "boolean",
+          "description": "Mount the application container root filesystem as read-only.",
+          "markdownDescription": "Mount root filesystem as read-only.",
+          "default": true
+        },
+        "runAsUser": {
+          "type": "integer",
+          "description": "User ID to run as.",
+          "markdownDescription": "User ID to run as."
+        },
+        "runAsGroup": {
+          "type": "integer",
+          "description": "Group ID to run as.",
+          "markdownDescription": "Group ID to run as."
+        },
+        "runAsNonRoot": {
+          "type": "boolean",
+          "description": "Require the application container to run as a non-root user.",
+          "markdownDescription": "Require container to run as non-root.",
+          "default": true
+        },
+        "seccompProfile": {
+          "type": "object",
+          "description": "Linux seccomp profile settings.",
+          "additionalProperties": true,
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "Seccomp profile type.",
+              "enum": [
+                "RuntimeDefault",
+                "Localhost",
+                "Unconfined"
+              ],
+              "markdownDescription": "Seccomp profile type."
+            },
+            "localhostProfile": {
+              "type": "string",
+              "description": "Localhost profile path when type is Localhost.",
+              "markdownDescription": "Localhost profile path when type is Localhost."
+            }
+          },
+          "markdownDescription": "Linux seccomp profile settings."
+        }
+      }
+    },
+    "podAffinityPreset": {
+      "type": "string",
+      "default": "",
+      "description": "Pod affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard` Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity",
+      "enum": [
+        "",
+        "soft",
+        "hard"
+      ]
+    },
+    "podAntiAffinityPreset": {
+      "type": "string",
+      "default": "soft",
+      "description": "Pod anti-affinity preset. Ignored if `affinity` is set. Allowed values: `soft` or `hard` Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity",
+      "enum": [
+        "",
+        "soft",
+        "hard"
+      ]
+    },
+    "nodeAffinityPreset": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "",
+          "description": "Node affinity preset type. Ignored if `affinity` is set. Allowed values: `soft` or `hard`",
+          "enum": [
+            "",
+            "soft",
+            "hard"
+          ]
+        },
+        "key": {
+          "type": "string",
+          "default": "",
+          "description": "Node label key to match. Ignored if `affinity` is set"
+        },
+        "values": {
+          "type": "array",
+          "items": {},
+          "default": [],
+          "description": "Node label values to match. Ignored if `affinity` is set E.g. values:   - e2e-az1   - e2e-az2"
+        }
+      },
+      "description": "Node affinity preset ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity",
+      "markdownDescription": "Shortcut for simple node affinity rules. Ignored when full `affinity` is set."
+    },
+    "affinity": {
+      "type": "object",
+      "description": "Affinity for pods assignment Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity NOTE: `podAffinityPreset`, `podAntiAffinityPreset`, and `nodeAffinityPreset` will be ignored when it's set",
+      "markdownDescription": "Pod affinity and anti-affinity rules. Use for advanced placement relative to nodes or other pods.",
+      "additionalProperties": true,
+      "properties": {
+        "nodeAffinity": {
+          "type": "object",
+          "description": "Node affinity rules.",
+          "additionalProperties": true,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "type": "object",
+              "description": "Required node selector terms.",
+              "additionalProperties": true,
+              "markdownDescription": "Required node selector terms."
+            },
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "type": "array",
+              "description": "Preferred node selector terms.",
+              "items": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "markdownDescription": "Preferred node selector terms."
+            }
+          },
+          "markdownDescription": "Node affinity rules."
+        },
+        "podAffinity": {
+          "type": "object",
+          "description": "Pod affinity rules.",
+          "additionalProperties": true,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            },
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          },
+          "markdownDescription": "Pod affinity rules."
+        },
+        "podAntiAffinity": {
+          "type": "object",
+          "description": "Pod anti-affinity rules.",
+          "additionalProperties": true,
+          "properties": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            },
+            "preferredDuringSchedulingIgnoredDuringExecution": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          },
+          "markdownDescription": "Pod anti-affinity rules."
+        }
+      },
+      "default": {}
+    },
+    "nodeSelector": {
+      "type": "object",
+      "description": "Node labels for pods assignment ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/",
+      "markdownDescription": "Free-form map with string values. Good for labels, annotations, selectors, and string data.",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "default": {}
+    },
+    "tolerations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "description": "Kubernetes pod toleration.",
+        "markdownDescription": "Pod toleration allowing scheduling onto nodes with matching taints. Common operators: `Exists` and `Equal`.",
+        "additionalProperties": true,
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Taint key to tolerate.",
+            "markdownDescription": "Taint key to tolerate."
+          },
+          "operator": {
+            "type": "string",
+            "description": "Toleration operator.",
+            "enum": [
+              "Exists",
+              "Equal"
+            ],
+            "markdownDescription": "Toleration operator."
+          },
+          "value": {
+            "type": "string",
+            "description": "Taint value to match.",
+            "markdownDescription": "Taint value to match."
+          },
+          "effect": {
+            "type": "string",
+            "description": "Taint effect to tolerate.",
+            "enum": [
+              "NoSchedule",
+              "PreferNoSchedule",
+              "NoExecute"
+            ],
+            "markdownDescription": "Taint effect to tolerate."
+          },
+          "tolerationSeconds": {
+            "type": "integer",
+            "description": "Seconds to tolerate NoExecute taint.",
+            "minimum": 0,
+            "markdownDescription": "Seconds to tolerate NoExecute taint."
+          }
+        }
+      },
+      "default": [],
+      "description": "List of tolerations for pods assignment ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/"
+    },
+    "topologySpreadConstraints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "description": "Kubernetes pod topology spread constraint.",
+        "markdownDescription": "Pod topology spread constraint. Use to distribute pods across zones, nodes, or other topology domains.",
+        "additionalProperties": true,
+        "properties": {
+          "maxSkew": {
+            "type": "integer",
+            "description": "Maximum permitted skew between topology domains.",
+            "minimum": 1,
+            "markdownDescription": "Maximum permitted skew between topology domains."
+          },
+          "topologyKey": {
+            "type": "string",
+            "description": "Node label key defining topology domain.",
+            "markdownDescription": "Node label key defining topology domain."
+          },
+          "whenUnsatisfiable": {
+            "type": "string",
+            "description": "How to handle unsatisfied spread constraints.",
+            "enum": [
+              "DoNotSchedule",
+              "ScheduleAnyway"
+            ],
+            "markdownDescription": "How to handle unsatisfied spread constraints."
+          },
+          "labelSelector": {
+            "type": "object",
+            "description": "Kubernetes label selector.",
+            "additionalProperties": true,
+            "properties": {
+              "matchLabels": {
+                "type": "object",
+                "description": "Map of label keys and values to match.",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "markdownDescription": "Map of label keys and values to match."
+              },
+              "matchExpressions": {
+                "type": "array",
+                "description": "List of label selector requirements.",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "description": "Label key.",
+                      "markdownDescription": "Label key."
+                    },
+                    "operator": {
+                      "type": "string",
+                      "description": "Selector operator.",
+                      "enum": [
+                        "In",
+                        "NotIn",
+                        "Exists",
+                        "DoesNotExist"
+                      ],
+                      "markdownDescription": "Selector operator."
+                    },
+                    "values": {
+                      "type": "array",
+                      "description": "Label values.",
+                      "items": {
+                        "type": "string"
+                      },
+                      "markdownDescription": "Label values."
+                    }
+                  }
+                },
+                "markdownDescription": "List of label selector requirements."
+              }
+            },
+            "markdownDescription": "Kubernetes label selector."
+          },
+          "matchLabelKeys": {
+            "type": "array",
+            "description": "Pod label keys used to select matching pods.",
+            "items": {
+              "type": "string"
+            },
+            "markdownDescription": "Pod label keys used to select matching pods."
+          },
+          "minDomains": {
+            "type": "integer",
+            "description": "Minimum number of eligible topology domains.",
+            "minimum": 1,
+            "markdownDescription": "Minimum number of eligible topology domains."
+          },
+          "nodeAffinityPolicy": {
+            "type": "string",
+            "description": "Whether to honor node affinity when calculating spread.",
+            "enum": [
+              "Honor",
+              "Ignore"
+            ],
+            "markdownDescription": "Whether to honor node affinity when calculating spread."
+          },
+          "nodeTaintsPolicy": {
+            "type": "string",
+            "description": "Whether to honor node taints when calculating spread.",
+            "enum": [
+              "Honor",
+              "Ignore"
+            ],
+            "markdownDescription": "Whether to honor node taints when calculating spread."
+          }
+        }
+      },
+      "default": [],
+      "description": "Spread Constraints for pod assignment ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/ E.g. topologySpreadConstraints:   - maxSkew: 1     topologyKey: node     whenUnsatisfiable: DoNotSchedule"
+    },
+    "livenessProbe": {
+      "type": "object",
+      "description": "Kubernetes container probe.",
+      "markdownDescription": "Kubernetes probe for liveness, readiness, or startup checks. Use exactly one action such as `httpGet`, `exec`, `tcpSocket`, or `grpc`.",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable livenessProbe on bridges-api containers",
+          "markdownDescription": "Chart-level switch for enabling this probe when supported.",
+          "default": true
+        },
+        "httpGet": {
+          "type": "object",
+          "description": "HTTP GET probe action.",
+          "markdownDescription": "HTTP endpoint probe action for liveness, readiness, or startup checks. Set `path` and the container `port` name or number.",
+          "additionalProperties": true,
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "The HTTP endpoint path to be used for livenessProbe",
+              "markdownDescription": "HTTP path to request.",
+              "default": "/hc/live"
+            },
+            "port": {
+              "type": "string",
+              "description": "The port (or port name) used for livenessProbe",
+              "markdownDescription": "Container port name or number.",
+              "default": "http"
+            },
+            "host": {
+              "type": "string",
+              "description": "Host name to connect to.",
+              "markdownDescription": "Host name to connect to."
+            },
+            "scheme": {
+              "type": "string",
+              "description": "HTTP scheme.",
+              "enum": [
+                "HTTP",
+                "HTTPS"
+              ],
+              "markdownDescription": "HTTP scheme."
+            },
+            "httpHeaders": {
+              "type": "array",
+              "description": "Custom HTTP headers.",
+              "items": {
+                "type": "object",
+                "description": "HTTP header.",
+                "additionalProperties": true,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Header name.",
+                    "markdownDescription": "Header name."
+                  },
+                  "value": {
+                    "type": "string",
+                    "description": "Header value.",
+                    "markdownDescription": "Header value."
+                  }
+                },
+                "markdownDescription": "HTTP header."
+              },
+              "markdownDescription": "Custom HTTP headers."
+            }
+          }
+        },
+        "exec": {
+          "type": "object",
+          "description": "Exec probe action.",
+          "additionalProperties": true,
+          "properties": {
+            "command": {
+              "type": "array",
+              "description": "Command and arguments to execute.",
+              "items": {
+                "type": "string"
+              },
+              "markdownDescription": "Command and arguments to execute."
+            }
+          },
+          "markdownDescription": "Exec probe action."
+        },
+        "tcpSocket": {
+          "type": "object",
+          "description": "TCP socket probe action.",
+          "additionalProperties": true,
+          "properties": {
+            "port": {
+              "type": [
+                "string",
+                "integer"
+              ],
+              "description": "Container port name or number.",
+              "markdownDescription": "Container port name or number."
+            },
+            "host": {
+              "type": "string",
+              "description": "Host name to connect to.",
+              "markdownDescription": "Host name to connect to."
+            }
+          },
+          "markdownDescription": "TCP socket probe action."
+        },
+        "grpc": {
+          "type": "object",
+          "description": "gRPC probe action.",
+          "additionalProperties": true,
+          "properties": {
+            "port": {
+              "type": "integer",
+              "description": "gRPC port number.",
+              "minimum": 1,
+              "maximum": 65535,
+              "markdownDescription": "gRPC port number."
+            },
+            "service": {
+              "type": "string",
+              "description": "gRPC service name.",
+              "markdownDescription": "gRPC service name."
+            }
+          },
+          "markdownDescription": "gRPC probe action."
+        },
+        "initialDelaySeconds": {
+          "type": "integer",
+          "description": "Initial delay seconds for livenessProbe",
+          "minimum": 0,
+          "markdownDescription": "Seconds before starting probe checks.",
+          "default": 10
+        },
+        "periodSeconds": {
+          "type": "integer",
+          "description": "Period seconds for livenessProbe",
+          "minimum": 1,
+          "markdownDescription": "How often to run the probe, in seconds.",
+          "default": 10
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "description": "Timeout seconds for livenessProbe",
+          "minimum": 1,
+          "markdownDescription": "Probe timeout in seconds.",
+          "default": 2
+        },
+        "failureThreshold": {
+          "type": "integer",
+          "description": "Failure threshold for livenessProbe",
+          "minimum": 1,
+          "markdownDescription": "Failures before considering the probe failed.",
+          "default": 6
+        },
+        "successThreshold": {
+          "type": "integer",
+          "description": "Success threshold for livenessProbe",
+          "minimum": 1,
+          "markdownDescription": "Successes before considering the probe successful.",
+          "default": 1
+        },
+        "terminationGracePeriodSeconds": {
+          "type": "integer",
+          "description": "Optional per-probe termination grace period.",
+          "minimum": 1,
+          "markdownDescription": "Optional per-probe termination grace period."
+        }
+      }
+    },
+    "readinessProbe": {
+      "type": "object",
+      "description": "Kubernetes container probe.",
+      "markdownDescription": "Kubernetes probe for liveness, readiness, or startup checks. Use exactly one action such as `httpGet`, `exec`, `tcpSocket`, or `grpc`.",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable readinessProbe on bridges-api containers",
+          "markdownDescription": "Chart-level switch for enabling this probe when supported.",
+          "default": true
+        },
+        "httpGet": {
+          "type": "object",
+          "description": "HTTP GET probe action.",
+          "markdownDescription": "HTTP endpoint probe action for liveness, readiness, or startup checks. Set `path` and the container `port` name or number.",
+          "additionalProperties": true,
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "The HTTP endpoint path to be used for readinessProbe",
+              "markdownDescription": "HTTP path to request.",
+              "default": "/hc/ready"
+            },
+            "port": {
+              "type": "string",
+              "description": "The port (or port name) used for readinessProbe",
+              "markdownDescription": "Container port name or number.",
+              "default": "http"
+            },
+            "host": {
+              "type": "string",
+              "description": "Host name to connect to.",
+              "markdownDescription": "Host name to connect to."
+            },
+            "scheme": {
+              "type": "string",
+              "description": "HTTP scheme.",
+              "enum": [
+                "HTTP",
+                "HTTPS"
+              ],
+              "markdownDescription": "HTTP scheme."
+            },
+            "httpHeaders": {
+              "type": "array",
+              "description": "Custom HTTP headers.",
+              "items": {
+                "type": "object",
+                "description": "HTTP header.",
+                "additionalProperties": true,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Header name.",
+                    "markdownDescription": "Header name."
+                  },
+                  "value": {
+                    "type": "string",
+                    "description": "Header value.",
+                    "markdownDescription": "Header value."
+                  }
+                },
+                "markdownDescription": "HTTP header."
+              },
+              "markdownDescription": "Custom HTTP headers."
+            }
+          }
+        },
+        "exec": {
+          "type": "object",
+          "description": "Exec probe action.",
+          "additionalProperties": true,
+          "properties": {
+            "command": {
+              "type": "array",
+              "description": "Command and arguments to execute.",
+              "items": {
+                "type": "string"
+              },
+              "markdownDescription": "Command and arguments to execute."
+            }
+          },
+          "markdownDescription": "Exec probe action."
+        },
+        "tcpSocket": {
+          "type": "object",
+          "description": "TCP socket probe action.",
+          "additionalProperties": true,
+          "properties": {
+            "port": {
+              "type": [
+                "string",
+                "integer"
+              ],
+              "description": "Container port name or number.",
+              "markdownDescription": "Container port name or number."
+            },
+            "host": {
+              "type": "string",
+              "description": "Host name to connect to.",
+              "markdownDescription": "Host name to connect to."
+            }
+          },
+          "markdownDescription": "TCP socket probe action."
+        },
+        "grpc": {
+          "type": "object",
+          "description": "gRPC probe action.",
+          "additionalProperties": true,
+          "properties": {
+            "port": {
+              "type": "integer",
+              "description": "gRPC port number.",
+              "minimum": 1,
+              "maximum": 65535,
+              "markdownDescription": "gRPC port number."
+            },
+            "service": {
+              "type": "string",
+              "description": "gRPC service name.",
+              "markdownDescription": "gRPC service name."
+            }
+          },
+          "markdownDescription": "gRPC probe action."
+        },
+        "initialDelaySeconds": {
+          "type": "integer",
+          "description": "Initial delay seconds for readinessProbe",
+          "minimum": 0,
+          "markdownDescription": "Seconds before starting probe checks.",
+          "default": 10
+        },
+        "periodSeconds": {
+          "type": "integer",
+          "description": "Period seconds for readinessProbe",
+          "minimum": 1,
+          "markdownDescription": "How often to run the probe, in seconds.",
+          "default": 10
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "description": "Timeout seconds for readinessProbe",
+          "minimum": 1,
+          "markdownDescription": "Probe timeout in seconds.",
+          "default": 2
+        },
+        "failureThreshold": {
+          "type": "integer",
+          "description": "Failure threshold for readinessProbe",
+          "minimum": 1,
+          "markdownDescription": "Failures before considering the probe failed.",
+          "default": 3
+        },
+        "successThreshold": {
+          "type": "integer",
+          "description": "Success threshold for readinessProbe",
+          "minimum": 1,
+          "markdownDescription": "Successes before considering the probe successful.",
+          "default": 1
+        },
+        "terminationGracePeriodSeconds": {
+          "type": "integer",
+          "description": "Optional per-probe termination grace period.",
+          "minimum": 1,
+          "markdownDescription": "Optional per-probe termination grace period."
+        }
+      }
+    },
+    "startupProbe": {
+      "type": "object",
+      "description": "Kubernetes container probe.",
+      "markdownDescription": "Kubernetes probe for liveness, readiness, or startup checks. Use exactly one action such as `httpGet`, `exec`, `tcpSocket`, or `grpc`.",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable startupProbe on bridges-api containers",
+          "markdownDescription": "Chart-level switch for enabling this probe when supported.",
+          "default": true
+        },
+        "httpGet": {
+          "type": "object",
+          "description": "HTTP GET probe action.",
+          "markdownDescription": "HTTP endpoint probe action for liveness, readiness, or startup checks. Set `path` and the container `port` name or number.",
+          "additionalProperties": true,
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "The HTTP endpoint path to be used for startupProbe",
+              "markdownDescription": "HTTP path to request.",
+              "default": "/hc/startup"
+            },
+            "port": {
+              "type": "string",
+              "description": "The port (or port name) used for startupProbe",
+              "markdownDescription": "Container port name or number.",
+              "default": "http"
+            },
+            "host": {
+              "type": "string",
+              "description": "Host name to connect to.",
+              "markdownDescription": "Host name to connect to."
+            },
+            "scheme": {
+              "type": "string",
+              "description": "HTTP scheme.",
+              "enum": [
+                "HTTP",
+                "HTTPS"
+              ],
+              "markdownDescription": "HTTP scheme."
+            },
+            "httpHeaders": {
+              "type": "array",
+              "description": "Custom HTTP headers.",
+              "items": {
+                "type": "object",
+                "description": "HTTP header.",
+                "additionalProperties": true,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Header name.",
+                    "markdownDescription": "Header name."
+                  },
+                  "value": {
+                    "type": "string",
+                    "description": "Header value.",
+                    "markdownDescription": "Header value."
+                  }
+                },
+                "markdownDescription": "HTTP header."
+              },
+              "markdownDescription": "Custom HTTP headers."
+            }
+          }
+        },
+        "exec": {
+          "type": "object",
+          "description": "Exec probe action.",
+          "additionalProperties": true,
+          "properties": {
+            "command": {
+              "type": "array",
+              "description": "Command and arguments to execute.",
+              "items": {
+                "type": "string"
+              },
+              "markdownDescription": "Command and arguments to execute."
+            }
+          },
+          "markdownDescription": "Exec probe action."
+        },
+        "tcpSocket": {
+          "type": "object",
+          "description": "TCP socket probe action.",
+          "additionalProperties": true,
+          "properties": {
+            "port": {
+              "type": [
+                "string",
+                "integer"
+              ],
+              "description": "Container port name or number.",
+              "markdownDescription": "Container port name or number."
+            },
+            "host": {
+              "type": "string",
+              "description": "Host name to connect to.",
+              "markdownDescription": "Host name to connect to."
+            }
+          },
+          "markdownDescription": "TCP socket probe action."
+        },
+        "grpc": {
+          "type": "object",
+          "description": "gRPC probe action.",
+          "additionalProperties": true,
+          "properties": {
+            "port": {
+              "type": "integer",
+              "description": "gRPC port number.",
+              "minimum": 1,
+              "maximum": 65535,
+              "markdownDescription": "gRPC port number."
+            },
+            "service": {
+              "type": "string",
+              "description": "gRPC service name.",
+              "markdownDescription": "gRPC service name."
+            }
+          },
+          "markdownDescription": "gRPC probe action."
+        },
+        "initialDelaySeconds": {
+          "type": "integer",
+          "description": "Initial delay seconds for startupProbe",
+          "minimum": 0,
+          "markdownDescription": "Seconds before starting probe checks.",
+          "default": 10
+        },
+        "periodSeconds": {
+          "type": "integer",
+          "description": "Period seconds for startupProbe",
+          "minimum": 1,
+          "markdownDescription": "How often to run the probe, in seconds.",
+          "default": 5
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "description": "Timeout seconds for startupProbe",
+          "minimum": 1,
+          "markdownDescription": "Probe timeout in seconds.",
+          "default": 10
+        },
+        "failureThreshold": {
+          "type": "integer",
+          "description": "Failure threshold for startupProbe",
+          "minimum": 1,
+          "markdownDescription": "Failures before considering the probe failed.",
+          "default": 20
+        },
+        "successThreshold": {
+          "type": "integer",
+          "description": "Success threshold for startupProbe",
+          "minimum": 1,
+          "markdownDescription": "Successes before considering the probe successful.",
+          "default": 1
+        },
+        "terminationGracePeriodSeconds": {
+          "type": "integer",
+          "description": "Optional per-probe termination grace period.",
+          "minimum": 1,
+          "markdownDescription": "Optional per-probe termination grace period."
+        }
+      }
+    },
+    "customLivenessProbe": {
+      "type": "object",
+      "description": "Custom livenessProbe that overrides the default one",
+      "markdownDescription": "Kubernetes probe for liveness, readiness, or startup checks. Use exactly one action such as `httpGet`, `exec`, `tcpSocket`, or `grpc`.",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Chart-level switch for enabling this probe when supported.",
+          "markdownDescription": "Chart-level switch for enabling this probe when supported."
+        },
+        "httpGet": {
+          "type": "object",
+          "description": "HTTP GET probe action.",
+          "markdownDescription": "HTTP endpoint probe action for liveness, readiness, or startup checks. Set `path` and the container `port` name or number.",
+          "additionalProperties": true,
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "HTTP path to request.",
+              "markdownDescription": "HTTP path to request."
+            },
+            "port": {
+              "type": [
+                "string",
+                "integer"
+              ],
+              "description": "Container port name or number.",
+              "markdownDescription": "Container port name or number."
+            },
+            "host": {
+              "type": "string",
+              "description": "Host name to connect to.",
+              "markdownDescription": "Host name to connect to."
+            },
+            "scheme": {
+              "type": "string",
+              "description": "HTTP scheme.",
+              "enum": [
+                "HTTP",
+                "HTTPS"
+              ],
+              "markdownDescription": "HTTP scheme."
+            },
+            "httpHeaders": {
+              "type": "array",
+              "description": "Custom HTTP headers.",
+              "items": {
+                "type": "object",
+                "description": "HTTP header.",
+                "additionalProperties": true,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Header name.",
+                    "markdownDescription": "Header name."
+                  },
+                  "value": {
+                    "type": "string",
+                    "description": "Header value.",
+                    "markdownDescription": "Header value."
+                  }
+                },
+                "markdownDescription": "HTTP header."
+              },
+              "markdownDescription": "Custom HTTP headers."
+            }
+          }
+        },
+        "exec": {
+          "type": "object",
+          "description": "Exec probe action.",
+          "additionalProperties": true,
+          "properties": {
+            "command": {
+              "type": "array",
+              "description": "Command and arguments to execute.",
+              "items": {
+                "type": "string"
+              },
+              "markdownDescription": "Command and arguments to execute."
+            }
+          },
+          "markdownDescription": "Exec probe action."
+        },
+        "tcpSocket": {
+          "type": "object",
+          "description": "TCP socket probe action.",
+          "additionalProperties": true,
+          "properties": {
+            "port": {
+              "type": [
+                "string",
+                "integer"
+              ],
+              "description": "Container port name or number.",
+              "markdownDescription": "Container port name or number."
+            },
+            "host": {
+              "type": "string",
+              "description": "Host name to connect to.",
+              "markdownDescription": "Host name to connect to."
+            }
+          },
+          "markdownDescription": "TCP socket probe action."
+        },
+        "grpc": {
+          "type": "object",
+          "description": "gRPC probe action.",
+          "additionalProperties": true,
+          "properties": {
+            "port": {
+              "type": "integer",
+              "description": "gRPC port number.",
+              "minimum": 1,
+              "maximum": 65535,
+              "markdownDescription": "gRPC port number."
+            },
+            "service": {
+              "type": "string",
+              "description": "gRPC service name.",
+              "markdownDescription": "gRPC service name."
+            }
+          },
+          "markdownDescription": "gRPC probe action."
+        },
+        "initialDelaySeconds": {
+          "type": "integer",
+          "description": "Seconds before starting probe checks.",
+          "minimum": 0,
+          "markdownDescription": "Seconds before starting probe checks."
+        },
+        "periodSeconds": {
+          "type": "integer",
+          "description": "How often to run the probe, in seconds.",
+          "minimum": 1,
+          "markdownDescription": "How often to run the probe, in seconds."
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "description": "Probe timeout in seconds.",
+          "minimum": 1,
+          "markdownDescription": "Probe timeout in seconds."
+        },
+        "failureThreshold": {
+          "type": "integer",
+          "description": "Failures before considering the probe failed.",
+          "minimum": 1,
+          "markdownDescription": "Failures before considering the probe failed."
+        },
+        "successThreshold": {
+          "type": "integer",
+          "description": "Successes before considering the probe successful.",
+          "minimum": 1,
+          "markdownDescription": "Successes before considering the probe successful."
+        },
+        "terminationGracePeriodSeconds": {
+          "type": "integer",
+          "description": "Optional per-probe termination grace period.",
+          "minimum": 1,
+          "markdownDescription": "Optional per-probe termination grace period."
+        }
+      },
+      "default": {}
+    },
+    "customReadinessProbe": {
+      "type": "object",
+      "description": "Custom readinessProbe that overrides the default one",
+      "markdownDescription": "Kubernetes probe for liveness, readiness, or startup checks. Use exactly one action such as `httpGet`, `exec`, `tcpSocket`, or `grpc`.",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Chart-level switch for enabling this probe when supported.",
+          "markdownDescription": "Chart-level switch for enabling this probe when supported."
+        },
+        "httpGet": {
+          "type": "object",
+          "description": "HTTP GET probe action.",
+          "markdownDescription": "HTTP endpoint probe action for liveness, readiness, or startup checks. Set `path` and the container `port` name or number.",
+          "additionalProperties": true,
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "HTTP path to request.",
+              "markdownDescription": "HTTP path to request."
+            },
+            "port": {
+              "type": [
+                "string",
+                "integer"
+              ],
+              "description": "Container port name or number.",
+              "markdownDescription": "Container port name or number."
+            },
+            "host": {
+              "type": "string",
+              "description": "Host name to connect to.",
+              "markdownDescription": "Host name to connect to."
+            },
+            "scheme": {
+              "type": "string",
+              "description": "HTTP scheme.",
+              "enum": [
+                "HTTP",
+                "HTTPS"
+              ],
+              "markdownDescription": "HTTP scheme."
+            },
+            "httpHeaders": {
+              "type": "array",
+              "description": "Custom HTTP headers.",
+              "items": {
+                "type": "object",
+                "description": "HTTP header.",
+                "additionalProperties": true,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Header name.",
+                    "markdownDescription": "Header name."
+                  },
+                  "value": {
+                    "type": "string",
+                    "description": "Header value.",
+                    "markdownDescription": "Header value."
+                  }
+                },
+                "markdownDescription": "HTTP header."
+              },
+              "markdownDescription": "Custom HTTP headers."
+            }
+          }
+        },
+        "exec": {
+          "type": "object",
+          "description": "Exec probe action.",
+          "additionalProperties": true,
+          "properties": {
+            "command": {
+              "type": "array",
+              "description": "Command and arguments to execute.",
+              "items": {
+                "type": "string"
+              },
+              "markdownDescription": "Command and arguments to execute."
+            }
+          },
+          "markdownDescription": "Exec probe action."
+        },
+        "tcpSocket": {
+          "type": "object",
+          "description": "TCP socket probe action.",
+          "additionalProperties": true,
+          "properties": {
+            "port": {
+              "type": [
+                "string",
+                "integer"
+              ],
+              "description": "Container port name or number.",
+              "markdownDescription": "Container port name or number."
+            },
+            "host": {
+              "type": "string",
+              "description": "Host name to connect to.",
+              "markdownDescription": "Host name to connect to."
+            }
+          },
+          "markdownDescription": "TCP socket probe action."
+        },
+        "grpc": {
+          "type": "object",
+          "description": "gRPC probe action.",
+          "additionalProperties": true,
+          "properties": {
+            "port": {
+              "type": "integer",
+              "description": "gRPC port number.",
+              "minimum": 1,
+              "maximum": 65535,
+              "markdownDescription": "gRPC port number."
+            },
+            "service": {
+              "type": "string",
+              "description": "gRPC service name.",
+              "markdownDescription": "gRPC service name."
+            }
+          },
+          "markdownDescription": "gRPC probe action."
+        },
+        "initialDelaySeconds": {
+          "type": "integer",
+          "description": "Seconds before starting probe checks.",
+          "minimum": 0,
+          "markdownDescription": "Seconds before starting probe checks."
+        },
+        "periodSeconds": {
+          "type": "integer",
+          "description": "How often to run the probe, in seconds.",
+          "minimum": 1,
+          "markdownDescription": "How often to run the probe, in seconds."
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "description": "Probe timeout in seconds.",
+          "minimum": 1,
+          "markdownDescription": "Probe timeout in seconds."
+        },
+        "failureThreshold": {
+          "type": "integer",
+          "description": "Failures before considering the probe failed.",
+          "minimum": 1,
+          "markdownDescription": "Failures before considering the probe failed."
+        },
+        "successThreshold": {
+          "type": "integer",
+          "description": "Successes before considering the probe successful.",
+          "minimum": 1,
+          "markdownDescription": "Successes before considering the probe successful."
+        },
+        "terminationGracePeriodSeconds": {
+          "type": "integer",
+          "description": "Optional per-probe termination grace period.",
+          "minimum": 1,
+          "markdownDescription": "Optional per-probe termination grace period."
+        }
+      },
+      "default": {}
+    },
+    "customStartupProbe": {
+      "type": "object",
+      "description": "Custom startupProbe that overrides the default one",
+      "markdownDescription": "Kubernetes probe for liveness, readiness, or startup checks. Use exactly one action such as `httpGet`, `exec`, `tcpSocket`, or `grpc`.",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Chart-level switch for enabling this probe when supported.",
+          "markdownDescription": "Chart-level switch for enabling this probe when supported."
+        },
+        "httpGet": {
+          "type": "object",
+          "description": "HTTP GET probe action.",
+          "markdownDescription": "HTTP endpoint probe action for liveness, readiness, or startup checks. Set `path` and the container `port` name or number.",
+          "additionalProperties": true,
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "HTTP path to request.",
+              "markdownDescription": "HTTP path to request."
+            },
+            "port": {
+              "type": [
+                "string",
+                "integer"
+              ],
+              "description": "Container port name or number.",
+              "markdownDescription": "Container port name or number."
+            },
+            "host": {
+              "type": "string",
+              "description": "Host name to connect to.",
+              "markdownDescription": "Host name to connect to."
+            },
+            "scheme": {
+              "type": "string",
+              "description": "HTTP scheme.",
+              "enum": [
+                "HTTP",
+                "HTTPS"
+              ],
+              "markdownDescription": "HTTP scheme."
+            },
+            "httpHeaders": {
+              "type": "array",
+              "description": "Custom HTTP headers.",
+              "items": {
+                "type": "object",
+                "description": "HTTP header.",
+                "additionalProperties": true,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Header name.",
+                    "markdownDescription": "Header name."
+                  },
+                  "value": {
+                    "type": "string",
+                    "description": "Header value.",
+                    "markdownDescription": "Header value."
+                  }
+                },
+                "markdownDescription": "HTTP header."
+              },
+              "markdownDescription": "Custom HTTP headers."
+            }
+          }
+        },
+        "exec": {
+          "type": "object",
+          "description": "Exec probe action.",
+          "additionalProperties": true,
+          "properties": {
+            "command": {
+              "type": "array",
+              "description": "Command and arguments to execute.",
+              "items": {
+                "type": "string"
+              },
+              "markdownDescription": "Command and arguments to execute."
+            }
+          },
+          "markdownDescription": "Exec probe action."
+        },
+        "tcpSocket": {
+          "type": "object",
+          "description": "TCP socket probe action.",
+          "additionalProperties": true,
+          "properties": {
+            "port": {
+              "type": [
+                "string",
+                "integer"
+              ],
+              "description": "Container port name or number.",
+              "markdownDescription": "Container port name or number."
+            },
+            "host": {
+              "type": "string",
+              "description": "Host name to connect to.",
+              "markdownDescription": "Host name to connect to."
+            }
+          },
+          "markdownDescription": "TCP socket probe action."
+        },
+        "grpc": {
+          "type": "object",
+          "description": "gRPC probe action.",
+          "additionalProperties": true,
+          "properties": {
+            "port": {
+              "type": "integer",
+              "description": "gRPC port number.",
+              "minimum": 1,
+              "maximum": 65535,
+              "markdownDescription": "gRPC port number."
+            },
+            "service": {
+              "type": "string",
+              "description": "gRPC service name.",
+              "markdownDescription": "gRPC service name."
+            }
+          },
+          "markdownDescription": "gRPC probe action."
+        },
+        "initialDelaySeconds": {
+          "type": "integer",
+          "description": "Seconds before starting probe checks.",
+          "minimum": 0,
+          "markdownDescription": "Seconds before starting probe checks."
+        },
+        "periodSeconds": {
+          "type": "integer",
+          "description": "How often to run the probe, in seconds.",
+          "minimum": 1,
+          "markdownDescription": "How often to run the probe, in seconds."
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "description": "Probe timeout in seconds.",
+          "minimum": 1,
+          "markdownDescription": "Probe timeout in seconds."
+        },
+        "failureThreshold": {
+          "type": "integer",
+          "description": "Failures before considering the probe failed.",
+          "minimum": 1,
+          "markdownDescription": "Failures before considering the probe failed."
+        },
+        "successThreshold": {
+          "type": "integer",
+          "description": "Successes before considering the probe successful.",
+          "minimum": 1,
+          "markdownDescription": "Successes before considering the probe successful."
+        },
+        "terminationGracePeriodSeconds": {
+          "type": "integer",
+          "description": "Optional per-probe termination grace period.",
+          "minimum": 1,
+          "markdownDescription": "Optional per-probe termination grace period."
+        }
+      },
+      "default": {}
+    },
+    "resourcesPreset": {
+      "type": "string",
+      "default": "micro",
+      "description": "Set container resources according to one common preset (allowed values: none, pico, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if resources is set (resources is recommended for production).",
+      "oneOf": [
+        {
+          "const": "none",
+          "description": "No preset values."
+        },
+        {
+          "const": "pico",
+          "description": "requests: cpu 5m, memory 32Mi, ephemeral-storage 50Mi; limits: cpu 100m, memory 128Mi, ephemeral-storage 2Gi"
+        },
+        {
+          "const": "nano",
+          "description": "requests: cpu 10m, memory 64Mi, ephemeral-storage 50Mi; limits: cpu 150m, memory 192Mi, ephemeral-storage 2Gi"
+        },
+        {
+          "const": "micro",
+          "description": "requests: cpu 25m, memory 256Mi, ephemeral-storage 50Mi; limits: cpu 500m, memory 512Mi, ephemeral-storage 2Gi"
+        },
+        {
+          "const": "small",
+          "description": "requests: cpu 50m, memory 512Mi, ephemeral-storage 50Mi; limits: cpu 1000m, memory 1Gi, ephemeral-storage 2Gi"
+        },
+        {
+          "const": "medium",
+          "description": "requests: cpu 500m, memory 1024Mi, ephemeral-storage 50Mi; limits: cpu 750m, memory 1536Mi, ephemeral-storage 2Gi"
+        },
+        {
+          "const": "large",
+          "description": "requests: cpu 1.0, memory 2048Mi, ephemeral-storage 50Mi; limits: cpu 1.5, memory 3072Mi, ephemeral-storage 2Gi"
+        },
+        {
+          "const": "xlarge",
+          "description": "requests: cpu 1.0, memory 3072Mi, ephemeral-storage 50Mi; limits: cpu 3.0, memory 6144Mi, ephemeral-storage 2Gi"
+        },
+        {
+          "const": "2xlarge",
+          "description": "requests: cpu 1.0, memory 3072Mi, ephemeral-storage 50Mi; limits: cpu 6.0, memory 12288Mi, ephemeral-storage 2Gi"
+        }
+      ]
+    },
+    "resources": {
+      "type": "object",
+      "description": "Set container requests and limits for different resources like CPU or memory (essential for production workloads) Example: resources:   requests:     cpu: 2     memory: 512Mi   limits:     cpu: 3     memory: 1024Mi",
+      "markdownDescription": "Container resource requests and limits. Set `requests` for scheduling guarantees and `limits` only when you need hard caps.",
+      "additionalProperties": true,
+      "properties": {
+        "requests": {
+          "type": "object",
+          "description": "Minimum requested resources.",
+          "markdownDescription": "Minimum resources reserved by the scheduler. Common keys: `cpu`, `memory`, and `ephemeral-storage`.",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number"
+            ],
+            "description": "Kubernetes resource quantity.",
+            "markdownDescription": "Kubernetes resource quantity."
+          },
+          "properties": {
+            "cpu": {
+              "type": [
+                "string",
+                "number"
+              ],
+              "description": "Kubernetes resource quantity.",
+              "markdownDescription": "Kubernetes resource quantity."
+            },
+            "memory": {
+              "type": [
+                "string",
+                "number"
+              ],
+              "description": "Kubernetes resource quantity.",
+              "markdownDescription": "Kubernetes resource quantity."
+            },
+            "ephemeral-storage": {
+              "type": [
+                "string",
+                "number"
+              ],
+              "description": "Kubernetes resource quantity.",
+              "markdownDescription": "Kubernetes resource quantity."
+            }
+          }
+        },
+        "limits": {
+          "type": "object",
+          "description": "Maximum allowed resources.",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number"
+            ],
+            "description": "Kubernetes resource quantity.",
+            "markdownDescription": "Kubernetes resource quantity."
+          },
+          "properties": {
+            "cpu": {
+              "type": [
+                "string",
+                "number"
+              ],
+              "description": "Kubernetes resource quantity.",
+              "markdownDescription": "Kubernetes resource quantity."
+            },
+            "memory": {
+              "type": [
+                "string",
+                "number"
+              ],
+              "description": "Kubernetes resource quantity.",
+              "markdownDescription": "Kubernetes resource quantity."
+            },
+            "ephemeral-storage": {
+              "type": [
+                "string",
+                "number"
+              ],
+              "description": "Kubernetes resource quantity.",
+              "markdownDescription": "Kubernetes resource quantity."
+            }
+          },
+          "markdownDescription": "Maximum allowed resources."
+        }
+      },
+      "default": {}
+    },
+    "pdb": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Create a PodDisruptionBudget for this deployment."
+        },
+        "minAvailable": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "default": 1,
+          "description": "Minimum pods that must remain available during voluntary disruption. Mutually exclusive with maxUnavailable.",
+          "minimum": 0
+        },
+        "maxUnavailable": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "default": "",
+          "description": "Maximum pods that may be unavailable during voluntary disruption. Mutually exclusive with minAvailable.",
+          "minimum": 0
+        },
+        "labels": {
+          "type": "object",
+          "description": "Extra labels for the PodDisruptionBudget.",
+          "markdownDescription": "Free-form map with string values. Good for labels, annotations, selectors, and string data.",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {}
+        },
+        "annotations": {
+          "type": "object",
+          "description": "Extra annotations for the PodDisruptionBudget.",
+          "markdownDescription": "Free-form map with string values. Good for labels, annotations, selectors, and string data.",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {}
+        }
+      },
+      "description": "PodDisruptionBudget for voluntary disruption protection.",
+      "markdownDescription": "Protects against drains, upgrades, and autoscaler evictions by requiring a minimum number of pods to remain available."
+    },
+    "autoscaling": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable or disable the HPA for this deployment."
+        },
+        "minReplicas": {
+          "type": "integer",
+          "default": 2,
+          "description": "Minimum number of pod replicas managed by the HPA.",
+          "minimum": 1
+        },
+        "maxReplicas": {
+          "type": "integer",
+          "default": 10,
+          "description": "Maximum number of pod replicas managed by the HPA.",
+          "minimum": 1
+        },
+        "targetCPU": {
+          "type": "integer",
+          "default": 70,
+          "description": "Target average CPU utilization percentage for scaling (e.g., 70 means scale up if average >70%).",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "targetMemory": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "default": null,
+          "description": "Target average memory utilization percentage for scaling. Disabled by default because .NET memory is a poor API demand signal.",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "customMetrics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "description": "HorizontalPodAutoscaler metric specification.",
+            "markdownDescription": "Autoscaling/v2 metric source. Choose one metric source such as `resource`, `pods`, `object`, `external`, or `containerResource`.",
+            "additionalProperties": true,
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Metric source type.",
+                "enum": [
+                  "Object",
+                  "Pods",
+                  "Resource",
+                  "ContainerResource",
+                  "External"
+                ],
+                "markdownDescription": "Metric source type."
+              },
+              "resource": {
+                "type": "object",
+                "description": "Resource metric source.",
+                "additionalProperties": true,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Resource name.",
+                    "markdownDescription": "Resource name."
+                  },
+                  "target": {
+                    "type": "object",
+                    "description": "HorizontalPodAutoscaler metric target.",
+                    "additionalProperties": true,
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "description": "Target type.",
+                        "enum": [
+                          "Utilization",
+                          "Value",
+                          "AverageValue"
+                        ],
+                        "markdownDescription": "Target type."
+                      },
+                      "value": {
+                        "type": [
+                          "string",
+                          "number"
+                        ],
+                        "description": "Kubernetes resource quantity.",
+                        "markdownDescription": "Kubernetes resource quantity."
+                      },
+                      "averageValue": {
+                        "type": [
+                          "string",
+                          "number"
+                        ],
+                        "description": "Kubernetes resource quantity.",
+                        "markdownDescription": "Kubernetes resource quantity."
+                      },
+                      "averageUtilization": {
+                        "type": "integer",
+                        "description": "Target average utilization percentage.",
+                        "minimum": 1,
+                        "markdownDescription": "Target average utilization percentage."
+                      }
+                    },
+                    "markdownDescription": "HorizontalPodAutoscaler metric target."
+                  }
+                },
+                "markdownDescription": "Resource metric source."
+              },
+              "containerResource": {
+                "type": "object",
+                "description": "Container resource metric source.",
+                "additionalProperties": true,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Resource name.",
+                    "markdownDescription": "Resource name."
+                  },
+                  "container": {
+                    "type": "string",
+                    "description": "Container name.",
+                    "markdownDescription": "Container name."
+                  },
+                  "target": {
+                    "type": "object",
+                    "description": "HorizontalPodAutoscaler metric target.",
+                    "additionalProperties": true,
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "description": "Target type.",
+                        "enum": [
+                          "Utilization",
+                          "Value",
+                          "AverageValue"
+                        ],
+                        "markdownDescription": "Target type."
+                      },
+                      "value": {
+                        "type": [
+                          "string",
+                          "number"
+                        ],
+                        "description": "Kubernetes resource quantity.",
+                        "markdownDescription": "Kubernetes resource quantity."
+                      },
+                      "averageValue": {
+                        "type": [
+                          "string",
+                          "number"
+                        ],
+                        "description": "Kubernetes resource quantity.",
+                        "markdownDescription": "Kubernetes resource quantity."
+                      },
+                      "averageUtilization": {
+                        "type": "integer",
+                        "description": "Target average utilization percentage.",
+                        "minimum": 1,
+                        "markdownDescription": "Target average utilization percentage."
+                      }
+                    },
+                    "markdownDescription": "HorizontalPodAutoscaler metric target."
+                  }
+                },
+                "markdownDescription": "Container resource metric source."
+              },
+              "pods": {
+                "type": "object",
+                "description": "Pods metric source.",
+                "additionalProperties": true,
+                "properties": {
+                  "metric": {
+                    "type": "object",
+                    "description": "Metric identifier.",
+                    "additionalProperties": true,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Metric name.",
+                        "markdownDescription": "Metric name."
+                      },
+                      "selector": {
+                        "type": "object",
+                        "description": "Kubernetes label selector.",
+                        "additionalProperties": true,
+                        "properties": {
+                          "matchLabels": {
+                            "type": "object",
+                            "description": "Map of label keys and values to match.",
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "markdownDescription": "Map of label keys and values to match."
+                          },
+                          "matchExpressions": {
+                            "type": "array",
+                            "description": "List of label selector requirements.",
+                            "items": {
+                              "type": "object",
+                              "additionalProperties": true,
+                              "properties": {
+                                "key": {
+                                  "type": "string",
+                                  "description": "Label key.",
+                                  "markdownDescription": "Label key."
+                                },
+                                "operator": {
+                                  "type": "string",
+                                  "description": "Selector operator.",
+                                  "enum": [
+                                    "In",
+                                    "NotIn",
+                                    "Exists",
+                                    "DoesNotExist"
+                                  ],
+                                  "markdownDescription": "Selector operator."
+                                },
+                                "values": {
+                                  "type": "array",
+                                  "description": "Label values.",
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "markdownDescription": "Label values."
+                                }
+                              }
+                            },
+                            "markdownDescription": "List of label selector requirements."
+                          }
+                        },
+                        "markdownDescription": "Kubernetes label selector."
+                      }
+                    },
+                    "markdownDescription": "Metric identifier."
+                  },
+                  "target": {
+                    "type": "object",
+                    "description": "HorizontalPodAutoscaler metric target.",
+                    "additionalProperties": true,
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "description": "Target type.",
+                        "enum": [
+                          "Utilization",
+                          "Value",
+                          "AverageValue"
+                        ],
+                        "markdownDescription": "Target type."
+                      },
+                      "value": {
+                        "type": [
+                          "string",
+                          "number"
+                        ],
+                        "description": "Kubernetes resource quantity.",
+                        "markdownDescription": "Kubernetes resource quantity."
+                      },
+                      "averageValue": {
+                        "type": [
+                          "string",
+                          "number"
+                        ],
+                        "description": "Kubernetes resource quantity.",
+                        "markdownDescription": "Kubernetes resource quantity."
+                      },
+                      "averageUtilization": {
+                        "type": "integer",
+                        "description": "Target average utilization percentage.",
+                        "minimum": 1,
+                        "markdownDescription": "Target average utilization percentage."
+                      }
+                    },
+                    "markdownDescription": "HorizontalPodAutoscaler metric target."
+                  }
+                },
+                "markdownDescription": "Pods metric source."
+              },
+              "object": {
+                "type": "object",
+                "description": "Object metric source.",
+                "additionalProperties": true,
+                "properties": {
+                  "describedObject": {
+                    "type": "object",
+                    "description": "Object being described by the metric.",
+                    "additionalProperties": true,
+                    "properties": {
+                      "apiVersion": {
+                        "type": "string"
+                      },
+                      "kind": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    },
+                    "markdownDescription": "Object being described by the metric."
+                  },
+                  "metric": {
+                    "type": "object",
+                    "description": "Metric identifier.",
+                    "additionalProperties": true,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Metric name.",
+                        "markdownDescription": "Metric name."
+                      },
+                      "selector": {
+                        "type": "object",
+                        "description": "Kubernetes label selector.",
+                        "additionalProperties": true,
+                        "properties": {
+                          "matchLabels": {
+                            "type": "object",
+                            "description": "Map of label keys and values to match.",
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "markdownDescription": "Map of label keys and values to match."
+                          },
+                          "matchExpressions": {
+                            "type": "array",
+                            "description": "List of label selector requirements.",
+                            "items": {
+                              "type": "object",
+                              "additionalProperties": true,
+                              "properties": {
+                                "key": {
+                                  "type": "string",
+                                  "description": "Label key.",
+                                  "markdownDescription": "Label key."
+                                },
+                                "operator": {
+                                  "type": "string",
+                                  "description": "Selector operator.",
+                                  "enum": [
+                                    "In",
+                                    "NotIn",
+                                    "Exists",
+                                    "DoesNotExist"
+                                  ],
+                                  "markdownDescription": "Selector operator."
+                                },
+                                "values": {
+                                  "type": "array",
+                                  "description": "Label values.",
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "markdownDescription": "Label values."
+                                }
+                              }
+                            },
+                            "markdownDescription": "List of label selector requirements."
+                          }
+                        },
+                        "markdownDescription": "Kubernetes label selector."
+                      }
+                    },
+                    "markdownDescription": "Metric identifier."
+                  },
+                  "target": {
+                    "type": "object",
+                    "description": "HorizontalPodAutoscaler metric target.",
+                    "additionalProperties": true,
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "description": "Target type.",
+                        "enum": [
+                          "Utilization",
+                          "Value",
+                          "AverageValue"
+                        ],
+                        "markdownDescription": "Target type."
+                      },
+                      "value": {
+                        "type": [
+                          "string",
+                          "number"
+                        ],
+                        "description": "Kubernetes resource quantity.",
+                        "markdownDescription": "Kubernetes resource quantity."
+                      },
+                      "averageValue": {
+                        "type": [
+                          "string",
+                          "number"
+                        ],
+                        "description": "Kubernetes resource quantity.",
+                        "markdownDescription": "Kubernetes resource quantity."
+                      },
+                      "averageUtilization": {
+                        "type": "integer",
+                        "description": "Target average utilization percentage.",
+                        "minimum": 1,
+                        "markdownDescription": "Target average utilization percentage."
+                      }
+                    },
+                    "markdownDescription": "HorizontalPodAutoscaler metric target."
+                  }
+                },
+                "markdownDescription": "Object metric source."
+              },
+              "external": {
+                "type": "object",
+                "description": "External metric source.",
+                "additionalProperties": true,
+                "properties": {
+                  "metric": {
+                    "type": "object",
+                    "description": "Metric identifier.",
+                    "additionalProperties": true,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Metric name.",
+                        "markdownDescription": "Metric name."
+                      },
+                      "selector": {
+                        "type": "object",
+                        "description": "Kubernetes label selector.",
+                        "additionalProperties": true,
+                        "properties": {
+                          "matchLabels": {
+                            "type": "object",
+                            "description": "Map of label keys and values to match.",
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "markdownDescription": "Map of label keys and values to match."
+                          },
+                          "matchExpressions": {
+                            "type": "array",
+                            "description": "List of label selector requirements.",
+                            "items": {
+                              "type": "object",
+                              "additionalProperties": true,
+                              "properties": {
+                                "key": {
+                                  "type": "string",
+                                  "description": "Label key.",
+                                  "markdownDescription": "Label key."
+                                },
+                                "operator": {
+                                  "type": "string",
+                                  "description": "Selector operator.",
+                                  "enum": [
+                                    "In",
+                                    "NotIn",
+                                    "Exists",
+                                    "DoesNotExist"
+                                  ],
+                                  "markdownDescription": "Selector operator."
+                                },
+                                "values": {
+                                  "type": "array",
+                                  "description": "Label values.",
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "markdownDescription": "Label values."
+                                }
+                              }
+                            },
+                            "markdownDescription": "List of label selector requirements."
+                          }
+                        },
+                        "markdownDescription": "Kubernetes label selector."
+                      }
+                    },
+                    "markdownDescription": "Metric identifier."
+                  },
+                  "target": {
+                    "type": "object",
+                    "description": "HorizontalPodAutoscaler metric target.",
+                    "additionalProperties": true,
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "description": "Target type.",
+                        "enum": [
+                          "Utilization",
+                          "Value",
+                          "AverageValue"
+                        ],
+                        "markdownDescription": "Target type."
+                      },
+                      "value": {
+                        "type": [
+                          "string",
+                          "number"
+                        ],
+                        "description": "Kubernetes resource quantity.",
+                        "markdownDescription": "Kubernetes resource quantity."
+                      },
+                      "averageValue": {
+                        "type": [
+                          "string",
+                          "number"
+                        ],
+                        "description": "Kubernetes resource quantity.",
+                        "markdownDescription": "Kubernetes resource quantity."
+                      },
+                      "averageUtilization": {
+                        "type": "integer",
+                        "description": "Target average utilization percentage.",
+                        "minimum": 1,
+                        "markdownDescription": "Target average utilization percentage."
+                      }
+                    },
+                    "markdownDescription": "HorizontalPodAutoscaler metric target."
+                  }
+                },
+                "markdownDescription": "External metric source."
+              }
+            }
+          },
+          "default": [],
+          "description": "Extra autoscaling/v2 HPA metrics, for example Pods/Object/External metrics from Prometheus Adapter."
+        },
+        "behavior": {
+          "type": "object",
+          "description": "Optional autoscaling/v2 behavior policies.",
+          "markdownDescription": "Controls HPA `scaleUp` and `scaleDown` stabilization windows and policies.",
+          "additionalProperties": true,
+          "properties": {
+            "scaleUp": {
+              "type": "object",
+              "description": "HorizontalPodAutoscaler scaling behavior for one direction.",
+              "additionalProperties": true,
+              "properties": {
+                "stabilizationWindowSeconds": {
+                  "type": "integer",
+                  "description": "Window used to stabilize scaling decisions.",
+                  "minimum": 0,
+                  "markdownDescription": "Window used to stabilize scaling decisions."
+                },
+                "selectPolicy": {
+                  "type": "string",
+                  "description": "Policy selection strategy.",
+                  "enum": [
+                    "Max",
+                    "Min",
+                    "Disabled"
+                  ],
+                  "markdownDescription": "Policy selection strategy."
+                },
+                "policies": {
+                  "type": "array",
+                  "description": "Scaling policies.",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "description": "Policy type.",
+                        "enum": [
+                          "Pods",
+                          "Percent"
+                        ],
+                        "markdownDescription": "Policy type."
+                      },
+                      "value": {
+                        "type": "integer",
+                        "description": "Policy value.",
+                        "minimum": 1,
+                        "markdownDescription": "Policy value."
+                      },
+                      "periodSeconds": {
+                        "type": "integer",
+                        "description": "Policy period in seconds.",
+                        "minimum": 1,
+                        "markdownDescription": "Policy period in seconds."
+                      }
+                    }
+                  },
+                  "markdownDescription": "Scaling policies."
+                }
+              },
+              "markdownDescription": "HorizontalPodAutoscaler scaling behavior for one direction."
+            },
+            "scaleDown": {
+              "type": "object",
+              "description": "HorizontalPodAutoscaler scaling behavior for one direction.",
+              "additionalProperties": true,
+              "properties": {
+                "stabilizationWindowSeconds": {
+                  "type": "integer",
+                  "description": "Window used to stabilize scaling decisions.",
+                  "minimum": 0,
+                  "markdownDescription": "Window used to stabilize scaling decisions."
+                },
+                "selectPolicy": {
+                  "type": "string",
+                  "description": "Policy selection strategy.",
+                  "enum": [
+                    "Max",
+                    "Min",
+                    "Disabled"
+                  ],
+                  "markdownDescription": "Policy selection strategy."
+                },
+                "policies": {
+                  "type": "array",
+                  "description": "Scaling policies.",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "description": "Policy type.",
+                        "enum": [
+                          "Pods",
+                          "Percent"
+                        ],
+                        "markdownDescription": "Policy type."
+                      },
+                      "value": {
+                        "type": "integer",
+                        "description": "Policy value.",
+                        "minimum": 1,
+                        "markdownDescription": "Policy value."
+                      },
+                      "periodSeconds": {
+                        "type": "integer",
+                        "description": "Policy period in seconds.",
+                        "minimum": 1,
+                        "markdownDescription": "Policy period in seconds."
+                      }
+                    }
+                  },
+                  "markdownDescription": "Scaling policies."
+                }
+              },
+              "markdownDescription": "HorizontalPodAutoscaler scaling behavior for one direction."
+            }
+          },
+          "default": {}
+        }
+      },
+      "description": "HorizontalPodAutoscaler settings.",
+      "markdownDescription": "Configure Kubernetes HPA min/max replicas, utilization targets, custom metrics, and scaling behavior."
+    },
+    "serviceAccount": {
+      "type": "object",
+      "properties": {
+        "create": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to create a ServiceAccount for this deployment."
+        },
+        "name": {
+          "type": "string",
+          "default": "",
+          "description": "Name of the ServiceAccount to use. If empty and `create` is true, a name is auto-generated."
+        },
+        "labels": {
+          "type": "object",
+          "description": "Additional labels to add to the ServiceAccount. Example:   labels:     azure.workload.identity/use: \"true\"",
+          "markdownDescription": "Free-form map with string values. Good for labels, annotations, selectors, and string data.",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {}
+        },
+        "annotations": {
+          "type": "object",
+          "description": "Additional annotations to add to the ServiceAccount.",
+          "markdownDescription": "Free-form map with string values. Good for labels, annotations, selectors, and string data.",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {}
+        }
+      },
+      "description": "Kubernetes ServiceAccount used by workload pods.",
+      "markdownDescription": "Create a chart-managed ServiceAccount or reference an existing one for pod identity and Kubernetes API access."
+    },
+    "platformConfig": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "default": "",
+          "description": "Existing platform ConfigMap name to import when platformConfig.data is empty. Defaults to <fullname>-platform-config when data is set."
+        },
+        "data": {
+          "type": "object",
+          "description": "Platform/runtime configuration data for the application ConfigMap. A ConfigMap is created when this map is non-empty.",
+          "markdownDescription": "Free-form map with string values. Good for labels, annotations, selectors, and string data.",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {}
+        },
+        "template": {
+          "type": "string",
+          "default": "",
+          "description": "Templated YAML map merged into platformConfig.data. Useful for generated config keys."
+        }
+      }
+    }
+  }
+}
